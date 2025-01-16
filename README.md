@@ -1,0 +1,3 @@
+# Labyrinth generator
+
+Generate labyrinthes.
