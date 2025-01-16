@@ -5,8 +5,7 @@
 #include <cassert>
 #include <iostream>
 #include <stdexcept>
-#include <stack>
-#include <map>
+#include <queue>
 
 void shout(std::string s) { std::cout << s << std::endl; }
 
@@ -48,7 +47,7 @@ std::ostream & operator<<(std::ostream & os, const Grid & grid) {
                 std::string line = line_to_string(*it, grid.m_width);
                 int y = it - grid.m_data;
                 if(y == grid.start.y) line[(grid.start.x + grid.m_width) * 3 + 2] = 'S';
-                if(y == grid.finish.y) line[(grid.finish.x + grid.m_width) * 3 + 2] = 'F';
+                if(y == grid.finish.y) line[(grid.finish.x + grid.m_width) * 3 + 2] = 'E';
                 os << line;
         }
         return os;
@@ -129,7 +128,6 @@ uint8_t ** Grid::generate_path() const {
 
         uint8_t ** prob_space = new uint8_t*[m_height];
 
-        /*shout("Initializing probability space");*/
         uint8_t ** end = prob_space + m_height;
         for(uint8_t ** it = prob_space; it != end; ++it) {
                 *it = new uint8_t[m_width];
@@ -138,24 +136,65 @@ uint8_t ** Grid::generate_path() const {
                   *jt = 0b1111;
         }
 
-        /*shout("Rebuilding path");*/
+        for(int i = 0; i < m_height; ++i) {
+                prob_space[i][0] &= 0;//~static_cast<uint8_t>(TILE::LEFT);
+                prob_space[i][m_width - 1] &= 0;//~static_cast<uint8_t>(TILE::RIGHT);
+        }
+
+        for(int i = 0; i < m_width; ++i) {
+                prob_space[0][i] &= 0;//~static_cast<uint8_t>(TILE::UP);
+                prob_space[m_height - 1][i] &= 0;//~static_cast<uint8_t>(TILE::DOWN);
+        }
+
         for (auto it = st.rbegin(); (it + 1) != st.rend(); ++it) {
-                /*shout("Processing (Path)" + std::to_string(it.x) + " , " + std::to_string(it.y));*/
                 auto pit = it + 1;
                 auto [src_tile, dst_tile] = tiles_from_step(*pit, *it);
                 m_data[pit->y][pit->x] |= src_tile;
                 m_data[it->y][it->x]   |= dst_tile;
-                uint8_t src_prob = static_cast<uint8_t>(src_tile);
-                uint8_t dst_prob = static_cast<uint8_t>(dst_tile);
-                prob_space[pit->y][pit->x] &= ~src_prob;
-                prob_space[it->y][it->x]   &= ~dst_prob;
+                prob_space[pit->y][pit->x] &= ~static_cast<uint8_t>(src_tile);
+                prob_space[it->y][it->x]   &= ~static_cast<uint8_t>(dst_tile);
         }
 
         return prob_space;
 }
 
-void Grid::colapse_wave_function(uint8_t **) {
+void Grid::colapse_wave_function(uint8_t ** proba_space) {
+        struct PrCoords {
+                PrCoords(Coords c) : c(c), p(rand()) {}
+                Coords c;
+                size_t p;
+                bool operator<(const PrCoords & other) const {return p < other.p;}
+        };
+        std::set<Coords> visited{start, finish};
+        std::priority_queue<PrCoords> open;
+        open.emplace(start); open.emplace(finish);
 
+        while(!open.empty()) {
+                auto [curr, _] = open.top(); open.pop();
+                m_data[curr.y][curr.x] |= TILE(uint8_t(rand()) & proba_space[curr.y][curr.x]); // Generating the tile
+                TILE curr_tile = m_data[curr.y][curr.x];
+
+                for (auto [neighbor, tile] : std::vector<std::pair<Coords, TILE>>{
+                         {Coords(curr.x - 1, curr.y), TILE::LEFT},
+                         {Coords(curr.x, curr.y - 1), TILE::UP},
+                         {Coords(curr.x + 1, curr.y), TILE::RIGHT},
+                         {Coords(curr.x, curr.y + 1), TILE::DOWN},
+                }) {
+                        if(neighbor.x < 0 || neighbor.y < 0 || neighbor.x >= m_width || neighbor.y >= m_height) continue;
+                        TILE new_tile = curr_tile & inverse_tile(tile);
+                        m_data[neighbor.y][neighbor.x] |= new_tile;
+                        proba_space[neighbor.y][neighbor.x] &= ~static_cast<uint8_t>(tile);
+                        if (!visited.contains(neighbor)) {
+                          visited.insert(neighbor);
+                          open.emplace(neighbor);
+                        }
+                }
+        }
+
+        for(int i = 0; i < m_height; ++i) {
+                delete [] proba_space[i];
+        }
+        delete [] proba_space;
 }
 
 #endif  //GRID_CPP_123927891273812731293719

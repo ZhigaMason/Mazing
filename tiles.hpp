@@ -22,12 +22,18 @@ enum class TILE : uint8_t {
         WALLDOWN          = EMPTY - DOWN
 };
 
+namespace tileio {
+        constexpr char WALL  = 'X';
+        constexpr char EMPTY = ' ';
+};
+
 TILE operator|(TILE l, TILE r);
 TILE & operator|=(TILE & l, TILE r);
 TILE operator&(TILE l, TILE r);
 TILE & operator&=(TILE & l, TILE r);
 bool is_present(TILE t);
 bool is_absent(TILE t);
+TILE inverse_tile(TILE t);
 
 std::string line_to_string(const TILE * const tiles, size_t length);
 

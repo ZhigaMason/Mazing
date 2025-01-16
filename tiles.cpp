@@ -19,21 +19,36 @@ bool is_present(TILE t) { return static_cast<uint8_t>(t); }
 
 bool is_absent(TILE t) { return !static_cast<uint8_t>(t); }
 
+TILE inverse_tile(TILE t) {
+        switch(t) {
+                case TILE::LEFT:
+                        return TILE::RIGHT;
+                case TILE::RIGHT:
+                        return TILE::LEFT;
+                case TILE::UP:
+                        return TILE::DOWN;
+                case TILE::DOWN:
+                        return TILE::UP;
+                default:
+                        return t;
+        };
+}
+
 std::array<char, 3> _push_correct_char_l1(TILE tile) {
-  return {'#', is_present(tile & TILE::UP) ? ' ' : '#', '#'};
+  return {tileio::WALL, is_present(tile & TILE::UP) ? tileio::EMPTY : tileio::WALL, tileio::WALL};
 }
 
 std::array<char, 3> _push_correct_char_l2(TILE tile) {
   return {
-      is_present(tile & TILE::LEFT) ? ' ' : '#',
-      tile != TILE::WALL ? ' ' : '#',
-      is_present(tile & TILE::RIGHT) ? ' ' : '#',
+      is_present(tile & TILE::LEFT) ? tileio::EMPTY : tileio::WALL,
+      tile != TILE::WALL ? tileio::EMPTY : tileio::WALL,
+      is_present(tile & TILE::RIGHT) ? tileio::EMPTY : tileio::WALL,
 
   };
 }
 
 std::array<char, 3> _push_correct_char_l3(TILE tile) {
-  return {'#', is_present(tile & TILE::DOWN) ? ' ' : '#', '#'};
+  return {tileio::WALL, is_present(tile & TILE::DOWN) ? tileio::EMPTY : tileio::WALL, tileio::WALL};
 }
 
 std::string line_to_string(const TILE *const tiles, size_t length) {
