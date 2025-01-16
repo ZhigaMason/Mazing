@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <string>
 
-enum class TILE : uint16_t {
+enum class TILE : uint8_t {
         EMPTY             = 0b1111,
         WALL              = 0b0000,
         LEFT              = 0b0001,
@@ -22,6 +22,14 @@ enum class TILE : uint16_t {
         WALLDOWN          = EMPTY - DOWN
 };
 
+TILE operator|(TILE l, TILE r);
+TILE & operator|=(TILE & l, TILE r);
+TILE operator&(TILE l, TILE r);
+TILE & operator&=(TILE & l, TILE r);
+bool is_present(TILE t);
+bool is_absent(TILE t);
+
 std::string line_to_string(const TILE * const tiles, size_t length);
+
 
 #endif // TILES_HPP_128937891273

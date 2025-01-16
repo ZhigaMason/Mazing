@@ -1,10 +1,11 @@
 #include <iostream>
-#include <vector>
-#include "tiles.hpp"
+#include "grid.hpp"
 
 int main() {
-        std::vector tmp{ TILE::RIGHT, TILE::LEFTRIGHT, TILE::LEFTUP };
-        std::cout << line_to_string(
-               tmp.data(), tmp.size()
-        );
+        srand(12);
+        for(int i = 0; i < 10; ++i) {
+                Grid g(10, 10);
+                g.fill_grid(rand());
+                std::cout << g << std::endl;
+        }
 }
