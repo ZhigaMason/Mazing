@@ -34,11 +34,16 @@ TILE inverse_tile(TILE t) {
         };
 }
 
-std::array<char, 3> _push_correct_char_l1(TILE tile) {
+tileio::tileio() {}
+
+const char tileio::WALL  = 'X';
+const char tileio::EMPTY = ' ';
+
+std::array<char, 3> tileio::_push_correct_char_l1(TILE tile) {
   return {tileio::WALL, is_present(tile & TILE::UP) ? tileio::EMPTY : tileio::WALL, tileio::WALL};
 }
 
-std::array<char, 3> _push_correct_char_l2(TILE tile) {
+std::array<char, 3> tileio::_push_correct_char_l2(TILE tile) {
   return {
       is_present(tile & TILE::LEFT) ? tileio::EMPTY : tileio::WALL,
       tile != TILE::WALL ? tileio::EMPTY : tileio::WALL,
@@ -47,11 +52,11 @@ std::array<char, 3> _push_correct_char_l2(TILE tile) {
   };
 }
 
-std::array<char, 3> _push_correct_char_l3(TILE tile) {
+std::array<char, 3> tileio::_push_correct_char_l3(TILE tile) {
   return {tileio::WALL, is_present(tile & TILE::DOWN) ? tileio::EMPTY : tileio::WALL, tileio::WALL};
 }
 
-std::string line_to_string(const TILE *const tiles, size_t length) {
+std::string tileio::line_to_string(const TILE *const tiles, size_t length) {
   std::vector<char> res;
   res.reserve(3 * (length + 1) + 1);
 

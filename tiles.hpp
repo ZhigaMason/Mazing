@@ -22,9 +22,15 @@ enum class TILE : uint8_t {
         WALLDOWN          = EMPTY - DOWN
 };
 
-namespace tileio {
-        constexpr char WALL  = 'X';
-        constexpr char EMPTY = ' ';
+struct tileio {
+        const static char WALL;
+        const static char EMPTY;
+        static std::string line_to_string(const TILE * const tiles, size_t length);
+private:
+        tileio();
+        static std::array<char, 3> _push_correct_char_l1(TILE tile);
+        static std::array<char, 3> _push_correct_char_l2(TILE tile);
+        static std::array<char, 3> _push_correct_char_l3(TILE tile);
 };
 
 TILE operator|(TILE l, TILE r);
@@ -35,7 +41,6 @@ bool is_present(TILE t);
 bool is_absent(TILE t);
 TILE inverse_tile(TILE t);
 
-std::string line_to_string(const TILE * const tiles, size_t length);
 
 
 #endif // TILES_HPP_128937891273
