@@ -33,3 +33,6 @@
 
 # Custom exeutable
 genlab
+
+# Non-technical files
+.clangd
