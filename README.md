@@ -8,7 +8,7 @@ Generate labyrinthes.
 
 ```bash
 make
-./main.out <seed|optional>
+./genlab <seed|optional>
 ```
 
 Then proceed with instructions given.

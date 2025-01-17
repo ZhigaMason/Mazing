@@ -1,6 +1,6 @@
 #ifndef GRID_HPP_12837891273891278
 #define GRID_HPP_12837891273891278
-#include "tiles.hpp"
+#include "../tile/tile.hpp"
 #include <vector>
 #include <memory>
 

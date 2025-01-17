@@ -1,6 +1,5 @@
 #include <iostream>
-#include "grid.hpp"
-#include "tiles.hpp"
+#include "../src/grid/grid.hpp"
 
 int main(int argc, char ** argv) {
         long seed = 0;

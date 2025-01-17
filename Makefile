@@ -1,14 +1,23 @@
-CXX := g++
+CXX := clang++
 CXXFLAGS := -pedantic -Wall -std=c++20
-LD := g++
+LD := clang++
 LDFLAGS := $(CXXFLAGS)
 
-sources := main.cpp tiles.cpp grid.cpp
+sources := cli/main.cpp src/tile/tile.cpp src/grid/grid.cpp
+targets := genlab
 
-all: main.out
+all: $(targets)
 
-main.out: $(sources:.cpp=.o)
+genlab: $(sources:.cpp=.o)
 	$(LD) $(LDFLAGS) $^ -o $@
 
+rules:
+	@$(CXX) -MM $(sources)
+
 clean:
-	rm $(sources:.cpp=.o) main.out
+	rm $(sources:.cpp=.o)
+
+clean-all: clean
+	rm $(targets)
+
+include dependencies.mk

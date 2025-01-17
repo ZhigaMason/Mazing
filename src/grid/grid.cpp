@@ -1,7 +1,6 @@
 #ifndef GRID_CPP_123927891273812731293719
 #define GRID_CPP_123927891273812731293719
 #include "grid.hpp"
-#include "tiles.hpp"
 #include <cassert>
 #include <iostream>
 #include <stdexcept>

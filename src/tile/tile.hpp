@@ -41,6 +41,4 @@ bool is_present(TILE t);
 bool is_absent(TILE t);
 TILE inverse_tile(TILE t);
 
-
-
 #endif // TILES_HPP_128937891273
