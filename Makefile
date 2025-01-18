@@ -1,12 +1,14 @@
 CC := clang
-CFLAGS := -pedantic -Wall -std=c23
+CFLAGS := -pedantic -Wall -O2 -fPIC -std=c23 -fsanitize=address -g
 LD := clang
 LDFLAGS := $(CFLAGS)
 
-sources := cli/main.c src/tile/tile.c
+sources := cli/main.c src/tile/tile.c src/grid/grid.c \
+	   src/grid/data_structures/stack.c src/grid/data_structures/random_container.c
 targets := genlab
 
 all: $(targets)
+	./genlab
 
 genlab: $(sources:.c=.o)
 	$(LD) $(LDFLAGS) $^ -o $@
