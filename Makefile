@@ -8,7 +8,6 @@ sources := cli/main.c src/tile/tile.c src/grid/grid.c \
 targets := genlab
 
 all: $(targets)
-	./genlab
 
 genlab: $(sources:.c=.o)
 	$(LD) $(LDFLAGS) $^ -o $@

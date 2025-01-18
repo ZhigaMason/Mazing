@@ -19,7 +19,7 @@ ETile inverse_tile(ETile t) {
         };
 }
 
-const char WALLIO  = 'X';
+const char WALLIO  = '#';
 const char EMPTYIO = ' ';
 
 const char * _push_correct_char_l1(ETile tile) {
