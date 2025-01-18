@@ -1,5 +1,5 @@
 CC := clang
-CFLAGS := -pedantic -Wall -O2 -fPIC -std=c23 -fsanitize=address -g
+CFLAGS := -pedantic -Wall -O2 -fPIC -std=c23
 LD := clang
 LDFLAGS := $(CFLAGS)
 
