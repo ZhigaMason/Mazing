@@ -16,10 +16,10 @@ void clean_random(PtrCoordsRandContainer rc) {
 }
 
 void swap_random(PtrCoordsRandContainer rc) {
-	size_t idx = rand() % rc->size, jdx = rand() % rc->size;
+	size_t idx = rand() % rc->size;
 	TCoords tmp = rc->data[idx];
-	rc->data[idx] = rc->data[jdx];
-	rc->data[jdx] = tmp;
+	rc->data[idx] = rc->data[rc->size - 1];
+	rc->data[rc->size - 1] = tmp;
 }
 
 void push_random(PtrCoordsRandContainer rc, TCoords c) {
@@ -32,7 +32,7 @@ void push_random(PtrCoordsRandContainer rc, TCoords c) {
 
 TCoords top_random(PtrCCoordsRandomContainer rc) {
 	swap_random(rc);
-	return rc->data[0];
+	return rc->data[rand() % rc->size];
 }
 
 TCoords pop_random(PtrCoordsRandContainer rc) {
