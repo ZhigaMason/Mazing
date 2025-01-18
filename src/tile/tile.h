@@ -26,6 +26,7 @@ extern const char WALLIO;
 extern const char EMPTYIO;
 ETile inverse_tile(ETile t);
 void print_tiles(const ETile * tiles, size_t length);
-
+void print_tiles_and_single_char(const ETile * tiles, size_t length, size_t pos, char c);
+void print_tiles_and_two_chars(const ETile * tiles, size_t length, size_t pos1, char c1, size_t pos2, char c2);
 
 #endif // TILES_H_128937891273
