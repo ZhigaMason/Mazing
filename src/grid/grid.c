@@ -1,5 +1,5 @@
-#ifndef GRID_CPP_123927891273812731293719
-#define GRID_CPP_123927891273812731293719
+#ifndef GRID_C_123927891273812731293719
+#define GRID_C_123927891273812731293719
 #include "grid.h"
 #include "data_structures/stack.h"
 #include "data_structures/random_container.h"
@@ -270,4 +270,4 @@ void fill_grid(PtrGrid pg, long seed) {
 	_clean_probability_space(&pps);
 }
 
-#endif  //GRID_CPP_123927891273812731293719
+#endif  //GRID_C_123927891273812731293719
