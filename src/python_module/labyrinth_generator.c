@@ -16,13 +16,15 @@ static PyObject * _coords_t_to_pytuple(TCoords c) {
 
 static int PyGrid_init(PyGrid *self, PyObject *args, PyObject *kwargs) {
 	static char * kws[] = {
-		"height", "width", "start", "exit", NULL
+		"height", "width", "start", "exit", "fill_grid", "seed", NULL
 	};
 
-	int height, width;
+	int height = 10, width = 10;
+	long seed = 1;
+	bool dofill_grid = false;
 	PyObject *start_tpl=nullptr, *exit_tpl = nullptr;
 
-	if(!PyArg_ParseTupleAndKeywords(args, kwargs, "ii|$OO: ", kws, &height, &width, &start_tpl, &exit_tpl)) {
+	if(!PyArg_ParseTupleAndKeywords(args, kwargs, "|ii$OOpl: ", kws, &height, &width, &start_tpl, &exit_tpl, &dofill_grid, &seed)) {
 		return -1;
 	}
 
@@ -81,6 +83,7 @@ static int PyGrid_init(PyGrid *self, PyObject *args, PyObject *kwargs) {
 		return -1;
 	}
 
+
 	self->q_grid = make_grid(
 		height, width,
 		start, exit
@@ -91,6 +94,10 @@ static int PyGrid_init(PyGrid *self, PyObject *args, PyObject *kwargs) {
 		return -1;
 	}
 
+
+	if(dofill_grid)
+		fill_grid(self->q_grid, seed);
+
 	return 0;
 }
 
@@ -99,7 +106,41 @@ static void PyGrid_del(PyGrid * self) {
 	Py_TYPE(self)->tp_free((PyObject *) self);
 }
 
+static PyObject * PyGrid_str(PyGrid * self) {
+	char * str = grid_to_wall_string(self->q_grid);
+	PyObject * ret = PyUnicode_FromStringAndSize(str, self->q_grid->height * self->q_grid->width * 9 + self->q_grid->height * 3);
+	free(str);
+	if(!ret) {
+		PyErr_Print();
+	}
+	return ret;
+}
+
+static PyObject * PyGrid_repr(PyGrid * self) {
+	wchar_t * str = grid_to_path_string(self->q_grid);
+	PyObject * ret = PyUnicode_FromWideChar(str, self->q_grid->height * self->q_grid->width + self->q_grid->height);
+	free(str);
+	if(!ret) {
+		PyErr_Print();
+	}
+	return ret;
+}
+
+static PyGrid * fill_maze(PyGrid * self, PyObject * args, PyObject * kwargs) {
+	static char * kws[]  = { "seed" };
+	if(!self->q_grid) {
+		return nullptr;
+	}
+	long seed = 1;
+	if(!PyArg_ParseTupleAndKeywords(args, kwargs, "|l: fill_maze", kws, &seed)){
+		PyErr_Print();
+	}
+	fill_grid(self->q_grid, seed);
+	Py_INCREF(self);
+	return self;
+}
 static PyMethodDef PyGrid_methods[] = {
+	{"fill_maze",  (PyCFunction) fill_maze, METH_VARARGS | METH_KEYWORDS, "Fills maze with randomly generated maze"},
 	{NULL}
 };
 
@@ -109,15 +150,17 @@ static PyMemberDef PyGrid_members[] = {
 
 static PyTypeObject grid_type = {
 	PyVarObject_HEAD_INIT(NULL, 0)
-	.tp_name = "labyrinth_generator.Grid",
-	.tp_basicsize = sizeof(PyGrid),
-	.tp_itemsize = 0,
-	.tp_dealloc = (destructor) PyGrid_del,
-	.tp_new = PyType_GenericNew,
-	.tp_init = (initproc) PyGrid_init,
-	.tp_flags = Py_TPFLAGS_DEFAULT,
-	.tp_members = PyGrid_members,
-	.tp_methods = PyGrid_methods,
+	.tp_name            = "labyrinth_generator.Grid",
+	.tp_basicsize       = sizeof(PyGrid),
+	.tp_itemsize        = 0,
+	.tp_dealloc         = (destructor) PyGrid_del,
+	.tp_new             = PyType_GenericNew,
+	.tp_init            = (initproc) PyGrid_init,
+	.tp_flags           = Py_TPFLAGS_DEFAULT,
+	.tp_repr            = (reprfunc) PyGrid_repr,
+	.tp_str             = (reprfunc) PyGrid_str,
+	.tp_members         = PyGrid_members,
+	.tp_methods         = PyGrid_methods,
 };
 
 static PyMethodDef labyrinth_generator_module_methods[] = {
