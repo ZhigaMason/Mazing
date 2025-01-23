@@ -37,7 +37,9 @@ int main(int argc, char ** argv) {
 		return 1;
 	}
 	fill_grid(g, seed);
-	print_grid(g);
+	char * str = grid_to_wall_string(g);
+	printf("%s", str);
+	free(str);
 	clean_grid(&g);
         return 0;
 }

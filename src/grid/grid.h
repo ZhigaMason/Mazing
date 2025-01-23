@@ -29,7 +29,7 @@ typedef const TGrid* PtrCGrid;
 void clean_grid(PtrGrid *);
 PtrGrid make_grid(int height, int width, TCoords start, TCoords finish);
 PtrGrid make_grid_corners(int height, int width);
-void print_grid(PtrCGrid);
+char * grid_to_wall_string(PtrCGrid);
 
 TCoords * _neighbors(PtrCGrid, TCoords);
 void _clean_probability_space(PtrProbaSp *);

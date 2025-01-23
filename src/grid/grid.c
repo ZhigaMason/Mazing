@@ -5,6 +5,7 @@
 #include "data_structures/random_container.h"
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 
 enum CMP _cmp_coords(TCoords l, TCoords r) {
   	return l.x == r.x ? l.y > l.x : -(l.y > l.x);
@@ -84,32 +85,17 @@ PtrGrid make_grid_corners(int height, int width) {
 	return make_grid(height, width, start, exit);
 }
 
-void print_grid(PtrCGrid pg) {
+char *  grid_to_wall_string(PtrCGrid pg) {
 	ETile ** end   = pg->data + pg->height;
-	ETile ** start = pg->data + pg->start.y;
-	ETile ** exit  = pg->data + pg->exit.y;
+	char * ret = calloc(pg->height * pg->width * 9 + pg->height * 3 + 1, sizeof(char));
+	char * str = ret;
 	for(ETile ** it = pg->data; it != end; ++it) {
-		if(start == it && exit == it) {
-			print_tiles_and_two_chars(
-				*it, pg->width,
-				pg->exit.x,  'E',
-				pg->start.x, 'S'
-			);
-		}
-		else if(start != it && exit == it) {
-			print_tiles_and_single_char(
-				*it, pg->width, pg->exit.x, 'E'
-			);
-		}
-		else if(start == it && exit != it) {
-			print_tiles_and_single_char(
-				*it, pg->width, pg->start.x, 'S'
-			);
-		}
-		else{
-			print_tiles(*it, pg->width);
-		}
+		tiles_to_wall_string(*it, pg->width, &str);
 	}
+	*str = '\0';
+	ret[pg->width * 3 + 2 + pg->start.y * pg->width * 9 + pg->start.y * 3 + pg->start.x * 3] = 'S';
+	ret[pg->width * 3 + 2 + pg->exit.y  * pg->width * 9 + pg->exit.y * 3  + pg->exit.x * 3]  = 'E';
+	return ret;
 }
 
 TCoords * _neighbors(PtrCGrid pg, TCoords cs) {
