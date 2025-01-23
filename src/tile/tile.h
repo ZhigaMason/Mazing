@@ -2,6 +2,7 @@
 #define TILES_H_128937891273
 #include <stdint.h>
 #include <stdlib.h>
+#include <wchar.h>
 
 typedef enum tile_t : uint8_t {
         WALL              = 0,
@@ -26,5 +27,6 @@ extern const char WALLIO;
 extern const char EMPTYIO;
 ETile inverse_tile(ETile t);
 void tiles_to_wall_string(const ETile * tiles, size_t length, char**str_p);
+void tiles_to_path_string(const ETile * tiles, size_t length, wchar_t**wstr_p);
 
 #endif // TILES_H_128937891273

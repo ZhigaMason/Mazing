@@ -57,5 +57,12 @@ void tiles_to_wall_string(const ETile * tiles, size_t length, char ** str_p) {
 	}
 	*((*str_p)++) = '\n';
 }
+void tiles_to_path_string(const ETile * tiles, size_t length, wchar_t**wstr_p) {
+	static const wchar_t char_table[] = { L' ', L'╸', L'╺', L'━', L'╹', L'┛', L'┗', L'┻', L'╻', L'┓', L'┏', L'┳', L'┃', L'┫', L'┣', L'╋'};
+	for(const ETile * it = tiles, *end=tiles+length; it != end; ++it) {
+		*((*wstr_p)++) = char_table[*it];
+	}
+	*((*wstr_p)++) = '\n';
+}
 
 #endif // ETileS_CPP_19231293789127389127

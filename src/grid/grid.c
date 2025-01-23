@@ -98,6 +98,19 @@ char *  grid_to_wall_string(PtrCGrid pg) {
 	return ret;
 }
 
+wchar_t * grid_to_path_string(PtrCGrid pg) {
+	ETile ** end   = pg->data + pg->height;
+	wchar_t * ret = calloc(pg->height * pg->width + pg->height + 1, sizeof(wchar_t));
+	wchar_t * str = ret;
+	for(ETile ** it = pg->data; it != end; ++it) {
+		tiles_to_path_string(*it, pg->width, &str);
+	}
+	*str = '\0';
+	ret[pg->width * pg->start.y + pg->start.y + pg->start.x] = 'S';
+	ret[pg->width * pg->exit.y + pg->exit.y + pg->exit.x]    = 'E';
+	return ret;
+}
+
 TCoords * _neighbors(PtrCGrid pg, TCoords cs) {
 	static TCoords ret[] = {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, 0}};
 	uint8_t idx = 0;
