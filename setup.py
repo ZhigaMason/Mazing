@@ -4,7 +4,7 @@ from setuptools import setup, Extension
 os.environ["CC"] = "clang"
 
 SRCS = [
-    "./pymodule/labyrinth_generator.c",
+    "./src/python_module/labyrinth_generator.c",
     "./src/tile/tile.c",
     "./src/grid/grid.c",
     "./src/grid/data_structures/stack.c",

@@ -1,6 +1,6 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
-#include "../src/grid/grid.h"
+#include "../grid/grid.h"
 
 typedef struct {
 	PyObject_HEAD;
