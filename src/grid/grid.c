@@ -248,9 +248,9 @@ void _colapse_wave_function(PtrGrid pg, PtrProbaSp pps) {
 		int length = adj[4].y;
 		for(const TCoords * it = adj, *end=adj+length; it != end; ++it) {
 			struct pair_tiles tiles = tiles_from_step(curr, *it);
-			ETile new_tile = curr_tile & tiles.s;
+			ETile new_tile = inverse_tile(curr_tile & tiles.f);
 			pg->data[it->y][it->x]  |= new_tile;
-			pps->data[it->y][it->x] &= ~tiles.f;
+			pps->data[it->y][it->x] &= ~tiles.s;
 			if(!visited[it->y][it->x]) {
 				visited[it->y][it->x] = 1;
 				push_random(&rc, *it);
