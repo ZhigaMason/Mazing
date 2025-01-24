@@ -49,6 +49,13 @@ void clean_grid(PtrGrid * ppg) {
 	*ppg = nullptr;
 }
 
+void clear_grid(PtrGrid pg) {
+	for(ETile ** it=pg->data, **end=pg->data + pg->height; it != end; ++it) {
+		for(ETile * jt = *it, *jend=*it + pg->width; jt != jend; ++jt)
+			*jt = WALL;
+	}
+}
+
 PtrGrid make_grid(int height, int width, TCoords start, TCoords exit) {
 	if(height < 1 || width < 1 ||
 		start.x < 0 || exit.x < 0 ||
