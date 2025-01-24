@@ -5,6 +5,7 @@
 typedef struct {
 	PyObject_HEAD;
 	PtrGrid q_grid;
+	bool q_is_filled;
 } PyGrid;
 
 static PyObject * _coords_t_to_pytuple(TCoords c) {
@@ -12,6 +13,28 @@ static PyObject * _coords_t_to_pytuple(TCoords c) {
 	PyTuple_SET_ITEM(ret, 0, PyLong_FromLong(c.x));
 	PyTuple_SET_ITEM(ret, 1, PyLong_FromLong(c.y));
 	return ret;
+}
+
+static int _pytuple_to_coords_t(PyObject * o, TCoords * c_ptr, const char * non_tuple_error, const char * invalid_num_entries, const char * non_positive_entries) {
+	if(!PyTuple_Check(o)) {
+		PyErr_SetString(PyExc_ValueError, non_tuple_error);
+		return -1;
+	}
+
+	if(PyTuple_Size(o) != 2) {
+		PyErr_SetString(PyExc_ValueError, invalid_num_entries);
+		return -1;
+	}
+
+	int x = PyLong_AsLong(PyTuple_GET_ITEM(o, 0));
+	int y = PyLong_AsLong(PyTuple_GET_ITEM(o, 1));
+	if(x < 0 || y < 0) {
+		PyErr_SetString(PyExc_ValueError, non_positive_entries);
+		return -1;
+	}
+	c_ptr->x = x;
+	c_ptr->y = y;
+	return 0;
 }
 
 static int PyGrid_init(PyGrid *self, PyObject *args, PyObject *kwargs) {
@@ -36,47 +59,13 @@ static int PyGrid_init(PyGrid *self, PyObject *args, PyObject *kwargs) {
 	TCoords start = {.x=0, .y=0};
 	TCoords exit  = {.x=width-1, .y=height-1};
 
-	if(start_tpl) {
-		if(!PyTuple_Check(start_tpl)) {
-			PyErr_SetString(PyExc_ValueError, "Expected tuple for start");
-			return -1;
-		}
+	if(start_tpl && _pytuple_to_coords_t(
+		start_tpl, &start, "Expected tuple for start", "Expected start tuple to have 2 entries", "Expected start entries to be positive integers"
+	)) return -1;
 
-		if(PyTuple_Size(start_tpl) != 2) {
-			PyErr_SetString(PyExc_ValueError, "Expected start tuple to have 2 entries");
-			return -1;
-		}
-
-		int x = PyLong_AsLong(PyTuple_GET_ITEM(start_tpl, 0));
-		int y = PyLong_AsLong(PyTuple_GET_ITEM(start_tpl, 1));
-		if(x < 0 || y < 0) {
-			PyErr_SetString(PyExc_ValueError, "Expected start entries to be positive");
-			return -1;
-		}
-		start.x = x;
-		start.y = y;
-	}
-
-	if(exit_tpl) {
-		if(!PyTuple_Check(start_tpl)) {
-			PyErr_SetString(PyExc_ValueError, "Expected tuple for exit");
-			return -1;
-		}
-
-		if(PyTuple_Size(exit_tpl) != 2) {
-			PyErr_SetString(PyExc_ValueError, "Expected exit tuple to have 2 entries");
-			return -1;
-		}
-
-		int x = PyLong_AsLong(PyTuple_GET_ITEM(exit_tpl, 0));
-		int y = PyLong_AsLong(PyTuple_GET_ITEM(exit_tpl, 1));
-		if(x < 0 || y < 0) {
-			PyErr_SetString(PyExc_ValueError, "Expected exit entries to be positive");
-			return -1;
-		}
-		exit.x = x;
-		exit.y = y;
-	}
+	if(exit_tpl && _pytuple_to_coords_t(
+		exit_tpl, &exit, "Expected tuple for exit", "Expected exit tuple to have 2 entries", "Expected exit entries to be positive integers"
+	)) return -1;
 
 	if(exit.x == start.x && exit.y == start.y) {
 		PyErr_SetString(PyExc_ValueError, "Start and finish cannot be on the same tile");
@@ -88,6 +77,7 @@ static int PyGrid_init(PyGrid *self, PyObject *args, PyObject *kwargs) {
 		height, width,
 		start, exit
 	);
+	self->q_is_filled = false;
 
 	if(!self->q_grid) {
 		PyErr_SetString(PyExc_MemoryError, "Memory allocation error occured.");
@@ -95,8 +85,10 @@ static int PyGrid_init(PyGrid *self, PyObject *args, PyObject *kwargs) {
 	}
 
 
-	if(dofill_grid)
+	if(dofill_grid) {
 		fill_grid(self->q_grid, seed);
+		self->q_is_filled = true;
+	}
 
 	return 0;
 }
@@ -136,9 +128,39 @@ static PyGrid * fill_maze(PyGrid * self, PyObject * args, PyObject * kwargs) {
 		PyErr_Print();
 	}
 	fill_grid(self->q_grid, seed);
+	self->q_is_filled = true;
 	Py_INCREF(self);
 	return self;
 }
+
+static PyObject * PyGrid_get_start(PyGrid * self, void * closure) {
+	return _coords_t_to_pytuple(self->q_grid->start);
+}
+
+static int PyGrid_set_start(PyGrid * self, PyObject * value, void * closure) {
+	if(_pytuple_to_coords_t(
+		value, &self->q_grid->start, "Expected tuple for start", "Expected start tuple to have 2 entries", "Expected start entries to be positive integers"
+	)) return -1;
+	return 0;
+}
+
+static PyObject * PyGrid_get_exit(PyGrid * self, void * closure) {
+	return _coords_t_to_pytuple(self->q_grid->exit);
+}
+
+static int PyGrid_set_exit(PyGrid * self, PyObject * value, void * closure) {
+	if(_pytuple_to_coords_t(
+		value, &self->q_grid->exit, "Expected tuple for exit", "Expected exit tuple to have 2 entries", "Expected exit entries to be positive integers"
+	)) return -1;
+	return 0;
+}
+
+static PyGetSetDef PyGrid_getset[] = {
+    {"start", (getter)PyGrid_get_start, (setter)PyGrid_set_start, "Start coordinates in the maze", NULL},
+    {"exit",  (getter)PyGrid_get_exit,  (setter)PyGrid_set_exit,  "exit coordinates in the maze",  NULL},
+    {NULL}
+};
+
 static PyMethodDef PyGrid_methods[] = {
 	{"fill_maze",  (PyCFunction) fill_maze, METH_VARARGS | METH_KEYWORDS, "Fills maze with randomly generated maze"},
 	{NULL}
@@ -161,6 +183,7 @@ static PyTypeObject grid_type = {
 	.tp_str             = (reprfunc) PyGrid_str,
 	.tp_members         = PyGrid_members,
 	.tp_methods         = PyGrid_methods,
+	.tp_getset          = PyGrid_getset
 };
 
 static PyMethodDef labyrinth_generator_module_methods[] = {
