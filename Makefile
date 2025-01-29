@@ -28,4 +28,4 @@ clean-all: clean
 	rm $(targets)
 	rm $(sources:.c=.o)
 
-include dependencies.mk
+include Makefile.d
