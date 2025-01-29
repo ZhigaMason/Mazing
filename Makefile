@@ -2,15 +2,21 @@ CC := clang
 CFLAGS := -pedantic -Wall -O2 -fPIC -std=c23
 LD := clang
 LDFLAGS := $(CFLAGS)
+PYTHON := python3
 
 sources := cli/main.c src/tile/tile.c src/grid/grid.c \
 	   src/grid/data_structures/stack.c src/grid/data_structures/random_container.c
-targets := genlab
+
+python_extension := build/lib.linux-x86_64-cpython-312/labyrinth_generator.cpython-312-x86_64-linux-gnu.so
+targets := genlab $(python_extension)
 
 all: $(targets)
 
 genlab: $(sources:.c=.o)
 	$(LD) $(LDFLAGS) $^ -o $@
+
+$(python_extension): setup.py
+	python3 setup.py build
 
 rules:
 	@$(CXX) -MM $(sources)
