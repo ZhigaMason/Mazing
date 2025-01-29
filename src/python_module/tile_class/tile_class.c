@@ -38,12 +38,38 @@ void PyGridTile_initialize_class() {
 		return;
 	}
 
-	PyGridTile * right_up_tile = PyObject_New(PyGridTile, &tile_type);
+        struct name_val {
+		const char *name;
+		ETile val;
+        };
 
-	if(right_up_tile) {
-		right_up_tile->q_val = RIGHTUP;
-		PyDict_SetItemString(tile_type.tp_dict, "RIGHT_UP", (PyObject *) right_up_tile);
-		Py_DECREF(right_up_tile);
+	static struct name_val arr[16] = {
+		{"EMPTY",         EMPTY},
+		{"UP",            UP},
+		{"DOWN",          DOWN},
+		{"LEFT",          LEFT},
+		{"RIGHT",         RIGHT},
+		{"HOR",           LEFT | RIGHT},
+		{"VER",	          UP | DOWN},
+		{"LEFT_UP",       LEFT | UP},
+		{"LEFT_DOWN",     LEFT | DOWN},
+		{"RIGHT_UP",      RIGHT | UP},
+		{"RIGHT_DOWN",    RIGHT | DOWN},
+		{"WALL_LEFT",     EMPTY - LEFT},
+		{"WALL_RIGHT",    EMPTY - RIGHT},
+		{"WALL_UP",       EMPTY - UP},
+		{"WALL_DOWN",     EMPTY - DOWN},
+		{"WALL",          WALL},
+	};
+
+	for(struct name_val * it = arr; it != (arr + 16); ++it) {
+		PyGridTile * tile = PyObject_New(PyGridTile, &tile_type);
+
+		if(tile) {
+			tile->q_val = it->val;
+			PyDict_SetItemString(tile_type.tp_dict, it->name, (PyObject *) tile);
+			Py_DECREF(tile);
+		}
 	}
 
 }
