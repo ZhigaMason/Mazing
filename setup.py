@@ -5,6 +5,8 @@ os.environ["CC"] = "clang"
 
 SRCS = [
     "./src/python_module/labyrinth_generator.c",
+    "./src/python_module/tile_class/tile_class.c",
+    "./src/python_module/grid_class/grid_class.c",
     "./src/tile/tile.c",
     "./src/grid/grid.c",
     "./src/grid/data_structures/stack.c",
@@ -14,11 +16,13 @@ SRCS = [
 DIRS = [
     "./src/tile/",
     "./src/grid/",
-    "./src/grid/data_structures"
+    "./src/grid/data_structures",
+    "./src/python_module/tile_class",
+    "./src/python_module/grid_class",
 ]
 
 CC_ARGS = [
-    "-O2", "-Wall", "-std=c23"
+    "-O2", "-Wall", "-std=c23", "-g"
 ]
 
 extension = Extension(
