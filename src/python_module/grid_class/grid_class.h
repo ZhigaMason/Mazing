@@ -32,6 +32,13 @@ int PyGrid_set_is_filled(PyGrid * self, PyObject * value, void * closure);
 
 extern PyGetSetDef PyGrid_getset[];
 
+PyObject * PyGrid_getitem(PyGrid * self, PyObject * key);
+
+int PyGrid_setitem(PyGrid * self, PyObject * key, PyObject * val);
+
+extern PyMappingMethods PyGrid_mappings;
+
+// Methods
 PyGrid * PyGrid_fill_maze(PyGrid * self, PyObject * args, PyObject * kwargs);
 
 PyGrid * PyGrid_clear_maze(PyGrid * self, PyObject * args);

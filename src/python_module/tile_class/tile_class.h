@@ -13,4 +13,5 @@ PyObject * PyGridTile_repr(PyGridTile * self);
 void PyGridTile_initialize_class();
 
 extern PyTypeObject tile_type;
+extern PyObject * _PyTile_Objects[16];
 #endif//TILE_PYTHON_CLASS_H_940F12F87N9NF41297F

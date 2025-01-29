@@ -16,6 +16,8 @@ PyTypeObject tile_type = {
 	.tp_doc             = "Tile grid class with constant tiles"
 };
 
+PyObject * _PyTile_Objects[16] = {0};
+
 PyObject * PyGridTile_repr(PyGridTile * self) {
 	static const wchar_t char_table[] = { L' ', L'╸', L'╺', L'━', L'╹', L'┛', L'┗', L'┻', L'╻', L'┓', L'┏', L'┳', L'┃', L'┫', L'┣', L'╋'};
 	if(self->q_val >= 16) {
@@ -34,7 +36,6 @@ void PyGridTile_initialize_class() {
 	if(!tile_type.tp_dict) tile_type.tp_dict = PyDict_New();
 
 	if(PyType_Ready(&tile_type) < 0) {
-		printf("L'achtung\n");
 		return;
 	}
 
@@ -68,6 +69,7 @@ void PyGridTile_initialize_class() {
 		if(tile) {
 			tile->q_val = it->val;
 			PyDict_SetItemString(tile_type.tp_dict, it->name, (PyObject *) tile);
+			_PyTile_Objects[it->val] = (PyObject *) tile;
 			Py_DECREF(tile);
 		}
 	}

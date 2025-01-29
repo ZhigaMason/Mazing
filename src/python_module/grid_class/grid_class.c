@@ -2,6 +2,7 @@
 #define GRID_PYTHON_CLASS_C_123S89F7DF987DG9S7DG
 #include <Python.h>
 #include "./grid_class.h"
+#include "../tile_class/tile_class.h"
 #include "../../grid/grid.h"
 
 
@@ -158,6 +159,44 @@ PyGetSetDef PyGrid_getset[] = {
     {NULL}
 };
 
+PyObject * PyGrid_getitem(PyGrid * self, PyObject * key) {
+	TCoords c;
+        if (_pytuple_to_coords_t(
+                key, &c, "Expected tuple for start",
+                "Expected start tuple to have 2 entries",
+                "Expected start entries to be positive integers") < 0)
+		return nullptr;
+	if(c.x >= self->q_grid->width || c.y >= self->q_grid->height) {
+		PyErr_SetString(PyExc_IndexError, "Expected coordinates to be inside of maze");
+		return nullptr;
+	}
+	return _PyTile_Objects[self->q_grid->data[c.y][c.x]];
+}
+
+int PyGrid_setitem(PyGrid * self, PyObject * key, PyObject * val) {
+	TCoords c;
+        if (_pytuple_to_coords_t(
+                key, &c, "Expected tuple for start",
+                "Expected start tuple to have 2 entries",
+                "Expected start entries to be positive integers") < 0)
+		return -1;
+	if(c.x >= self->q_grid->width || c.y >= self->q_grid->height) {
+		PyErr_SetString(PyExc_IndexError, "Expected coordinates to be inside of maze");
+		return -1;
+	}
+	if(!Py_IS_TYPE(val, &tile_type)) {
+		PyErr_SetString(PyExc_ValueError, "Expected to set TILE into grid");
+	}
+
+	self->q_grid->data[c.y][c.x] = ((PyGridTile *) val)->q_val;
+	return 0;
+}
+
+PyMappingMethods PyGrid_mappings = {
+    .mp_subscript = (binaryfunc)PyGrid_getitem,
+    .mp_ass_subscript = (objobjargproc)PyGrid_setitem,  // __setitem__
+};
+
 PyGrid * PyGrid_fill_maze(PyGrid * self, PyObject * args, PyObject * kwargs) {
 	static char * kws[]  = { "seed" };
 	if(!self->q_grid) {
@@ -256,6 +295,7 @@ PyTypeObject grid_type = {
 	.tp_repr            = (reprfunc) PyGrid_repr,
 	.tp_str             = (reprfunc) PyGrid_str,
 	.tp_methods         = PyGrid_methods,
-	.tp_getset          = PyGrid_getset
+	.tp_getset          = PyGrid_getset,
+	.tp_as_mapping      = &PyGrid_mappings
 };
 #endif//GRID_PYTHON_CLASS_C_123S89F7DF987DG9S7DG
