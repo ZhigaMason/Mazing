@@ -1,7 +1,6 @@
 #include "../src/grid/grid.h"
 #include <locale.h>
 #include <stdio.h>
-
 int main(int argc, char ** argv) {
 	setlocale(LC_ALL, "");
 	fwide(stdout, 1);
@@ -43,7 +42,7 @@ int main(int argc, char ** argv) {
 	fill_grid(g, seed);
 
 
-	char * str = grid_to_wall_string(g);
+	char * str = grid_to_wall_string(g, '#', ' ');
 	wprintf(L"%s\n\n", str);
 
 	wchar_t * wstr = grid_to_path_string(g);

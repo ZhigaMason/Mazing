@@ -6,12 +6,12 @@
 typedef struct {
 	PyObject_HEAD;
 	ETile q_val;
-} PyGridTile;
+} PyMazeTile;
 
-void PyGridTile_del(PyGridTile * self);
-PyObject * PyGridTile_repr(PyGridTile * self);
-void PyGridTile_initialize_class();
+void PyMazeTile_del(PyMazeTile * self);
+PyObject * PyMazeTile_repr(PyMazeTile * self);
+void PyMazeTile_initialize_class();
 
-extern PyTypeObject tile_type;
+extern PyTypeObject PyMazeTile_Type;
 extern PyObject * _PyTile_Objects[16];
 #endif//TILE_PYTHON_CLASS_H_940F12F87N9NF41297F

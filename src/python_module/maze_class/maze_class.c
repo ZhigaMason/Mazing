@@ -1,7 +1,7 @@
 #ifndef GRID_PYTHON_CLASS_C_123S89F7DF987DG9S7DG
 #define GRID_PYTHON_CLASS_C_123S89F7DF987DG9S7DG
 #include <Python.h>
-#include "./grid_class.h"
+#include "./maze_class.h"
 #include "../tile_class/tile_class.h"
 #include "../../grid/grid.h"
 
@@ -35,9 +35,9 @@ static int _pytuple_to_coords_t(PyObject * o, TCoords * c_ptr, const char * non_
 	return 0;
 }
 
-int PyGrid_init(PyGrid *self, PyObject *args, PyObject *kwargs) {
+int PyMaze_init(PyMaze *self, PyObject *args, PyObject *kwargs) {
 	static char * kws[] = {
-		"height", "width", "start", "exit", "fill_maze", "seed", NULL
+		"height", "width", "start", "exit", "fill", "seed", NULL
 	};
 
 	int height = 10, width = 10;
@@ -85,7 +85,7 @@ int PyGrid_init(PyGrid *self, PyObject *args, PyObject *kwargs) {
 		height, width,
 		start, exit
 	);
-	self->q_is_filled = false;
+	self->q_is_generated = false;
 
 	if(!self->q_grid) {
 		PyErr_SetString(PyExc_MemoryError, "Memory allocation error occured.");
@@ -95,71 +95,71 @@ int PyGrid_init(PyGrid *self, PyObject *args, PyObject *kwargs) {
 
 	if(dofill_grid) {
 		fill_grid(self->q_grid, seed);
-		self->q_is_filled = true;
+		self->q_is_generated = true;
 	}
 
 	return 0;
 }
 
-void PyGrid_del(PyGrid * self) {
+void PyMaze_del(PyMaze * self) {
 	clean_grid(&(self->q_grid));
 	Py_TYPE(self)->tp_free((PyObject *) self);
 }
 
-PyObject * PyGrid_str(PyGrid * self) {
-	char * str = grid_to_wall_string(self->q_grid);
+PyObject * PyMaze_str(PyMaze * self) {
+	char * str = grid_to_wall_string(self->q_grid, '#', ' ');
 	PyObject * ret = PyUnicode_FromStringAndSize(str, self->q_grid->height * self->q_grid->width * 9 + self->q_grid->height * 3);
 	free(str);
 	return ret;
 }
 
-PyObject * PyGrid_repr(PyGrid * self) {
+PyObject * PyMaze_repr(PyMaze * self) {
 	wchar_t * str = grid_to_path_string(self->q_grid);
 	PyObject * ret = PyUnicode_FromWideChar(str, self->q_grid->height * self->q_grid->width + self->q_grid->height);
 	free(str);
 	return ret;
 }
 
-PyObject * PyGrid_get_start(PyGrid * self, void * closure) {
+PyObject * PyMaze_get_start(PyMaze * self, void * closure) {
 	return _coords_t_to_pytuple(self->q_grid->start);
 }
 
-int PyGrid_set_start(PyGrid * self, PyObject * value, void * closure) {
+int PyMaze_set_start(PyMaze * self, PyObject * value, void * closure) {
 	if(_pytuple_to_coords_t(
 		value, &self->q_grid->start, "Expected tuple for start", "Expected start tuple to have 2 entries", "Expected start entries to be positive integers"
 	)) return -1;
 	return 0;
 }
 
-PyObject * PyGrid_get_exit(PyGrid * self, void * closure) {
+PyObject * PyMaze_get_exit(PyMaze * self, void * closure) {
 	return _coords_t_to_pytuple(self->q_grid->exit);
 }
 
-int PyGrid_set_exit(PyGrid * self, PyObject * value, void * closure) {
+int PyMaze_set_exit(PyMaze * self, PyObject * value, void * closure) {
 	if(_pytuple_to_coords_t(
 		value, &self->q_grid->exit, "Expected tuple for exit", "Expected exit tuple to have 2 entries", "Expected exit entries to be positive integers"
 	)) return -1;
 	return 0;
 }
 
-PyObject * PyGrid_get_is_filled(PyGrid * self, void * closure) {
-	return PyBool_FromLong(self->q_is_filled);
+PyObject * PyMaze_get_is_generated(PyMaze * self, void * closure) {
+	return PyBool_FromLong(self->q_is_generated);
 }
 
-int PyGrid_set_is_filled(PyGrid * self, PyObject * value, void * closure) {
+int PyMaze_set_is_generated(PyMaze * self, PyObject * value, void * closure) {
 	if(!PyBool_Check(value)) return -1;
-	self->q_is_filled = Py_IsTrue(value);
+	self->q_is_generated = Py_IsTrue(value);
 	return 0;
 }
 
-PyGetSetDef PyGrid_getset[] = {
-    {"start",      (getter)PyGrid_get_start,      (setter)PyGrid_set_start,      "Start coordinates in the maze", NULL},
-    {"exit",       (getter)PyGrid_get_exit,       (setter)PyGrid_set_exit,       "Exit coordinates in the maze",  NULL},
-    {"is_filled",  (getter)PyGrid_get_is_filled,  (setter)PyGrid_set_is_filled,  "Bool value if maze is filled",  NULL},
+PyGetSetDef PyMaze_getset[] = {
+    {"start",        (getter)PyMaze_get_start,         (setter)PyMaze_set_start,         "Start coordinates in the maze", NULL},
+    {"exit",         (getter)PyMaze_get_exit,          (setter)PyMaze_set_exit,          "Exit coordinates in the maze",  NULL},
+    {"is_generated", (getter)PyMaze_get_is_generated,  (setter)PyMaze_set_is_generated,  "Bool value if maze is filled",  NULL},
     {NULL}
 };
 
-PyObject * PyGrid_getitem(PyGrid * self, PyObject * key) {
+PyObject * PyMaze_getitem(PyMaze * self, PyObject * key) {
 	TCoords c;
         if (_pytuple_to_coords_t(
                 key, &c, "Expected tuple for start",
@@ -173,7 +173,7 @@ PyObject * PyGrid_getitem(PyGrid * self, PyObject * key) {
 	return _PyTile_Objects[self->q_grid->data[c.y][c.x]];
 }
 
-int PyGrid_setitem(PyGrid * self, PyObject * key, PyObject * val) {
+int PyMaze_setitem(PyMaze * self, PyObject * key, PyObject * val) {
 	TCoords c;
         if (_pytuple_to_coords_t(
                 key, &c, "Expected tuple for start",
@@ -184,20 +184,20 @@ int PyGrid_setitem(PyGrid * self, PyObject * key, PyObject * val) {
 		PyErr_SetString(PyExc_IndexError, "Expected coordinates to be inside of maze");
 		return -1;
 	}
-	if(!Py_IS_TYPE(val, &tile_type)) {
+	if(!Py_IS_TYPE(val, &PyMazeTile_Type)) {
 		PyErr_SetString(PyExc_ValueError, "Expected to set TILE into grid");
 	}
 
-	self->q_grid->data[c.y][c.x] = ((PyGridTile *) val)->q_val;
+	self->q_grid->data[c.y][c.x] = ((PyMazeTile *) val)->q_val;
 	return 0;
 }
 
-PyMappingMethods PyGrid_mappings = {
-    .mp_subscript = (binaryfunc)PyGrid_getitem,
-    .mp_ass_subscript = (objobjargproc)PyGrid_setitem,  // __setitem__
+PyMappingMethods PyMaze_mappings = {
+    .mp_subscript = (binaryfunc)PyMaze_getitem,
+    .mp_ass_subscript = (objobjargproc)PyMaze_setitem,  // __setitem__
 };
 
-PyGrid * PyGrid_fill_maze(PyGrid * self, PyObject * args, PyObject * kwargs) {
+PyMaze * PyMaze_fill_maze(PyMaze * self, PyObject * args, PyObject * kwargs) {
 	static char * kws[]  = { "seed" };
 	if(!self->q_grid) {
 		return nullptr;
@@ -207,19 +207,19 @@ PyGrid * PyGrid_fill_maze(PyGrid * self, PyObject * args, PyObject * kwargs) {
 		return nullptr;
 	}
 	fill_grid(self->q_grid, seed);
-	self->q_is_filled = true;
+	self->q_is_generated = true;
 	Py_INCREF(self);
 	return self;
 }
 
-PyGrid * PyGrid_clear_maze(PyGrid * self, PyObject * args) {
+PyMaze * PyMaze_clear_maze(PyMaze * self, PyObject * args) {
 	clear_grid(self->q_grid);
-	self->q_is_filled = false;
+	self->q_is_generated = false;
 	Py_INCREF(self);
 	return self;
 }
 
-PyGrid * PyGrid_set_start_safe(PyGrid * self, PyObject * args) {
+PyMaze * PyMaze_set_start_safe(PyMaze * self, PyObject * args) {
 	int x, y;
 
 	if(!PyArg_ParseTuple(args, "ii", &x, &y)) {
@@ -231,7 +231,7 @@ PyGrid * PyGrid_set_start_safe(PyGrid * self, PyObject * args) {
 		return nullptr;
 	}
 
-	if(self->q_is_filled && self->q_grid->data[y][x] == WALL) {
+	if(self->q_is_generated && self->q_grid->data[y][x] == TILE_WALL) {
 		PyErr_SetString(PyExc_AttributeError, "Setting start into wall tile. Change self.is_filled attribute or replace tile");
 		return nullptr;
 	}
@@ -247,7 +247,7 @@ PyGrid * PyGrid_set_start_safe(PyGrid * self, PyObject * args) {
 	return self;
 }
 
-PyGrid * PyGrid_set_exit_safe(PyGrid * self, PyObject * args) {
+PyMaze * PyMaze_set_exit_safe(PyMaze * self, PyObject * args) {
 	int x, y;
 
 	if(!PyArg_ParseTuple(args, "ii", &x, &y)) {
@@ -259,7 +259,7 @@ PyGrid * PyGrid_set_exit_safe(PyGrid * self, PyObject * args) {
 		return nullptr;
 	}
 
-	if(self->q_is_filled && self->q_grid->data[y][x] == WALL) {
+	if(self->q_is_generated && self->q_grid->data[y][x] == TILE_WALL) {
 		PyErr_SetString(PyExc_AttributeError, "Setting exit into wall tile. Change self.is_filled attribute or replace tile");
 		return nullptr;
 	}
@@ -275,27 +275,45 @@ PyGrid * PyGrid_set_exit_safe(PyGrid * self, PyObject * args) {
 	return self;
 }
 
-PyMethodDef PyGrid_methods[] = {
-	{"fill_maze",  (PyCFunction) PyGrid_fill_maze,      METH_VARARGS | METH_KEYWORDS, "Fills maze with randomly generated maze"},
-	{"clear_maze", (PyCFunction) PyGrid_clear_maze,     METH_NOARGS,                  "Clears maze"},
-	{"set_start",  (PyCFunction) PyGrid_set_start_safe, METH_VARARGS,                 "Performs itegrity checks and sets start"},
-	{"set_exit",   (PyCFunction) PyGrid_set_exit_safe,  METH_VARARGS,                 "Performs itegrity checks and sets exit"},
+PyObject * PyMaze_to_string(PyMaze * self, PyObject * args, PyObject * kwargs) {
+	static char * kws[] = {
+		"wall", "empty", NULL
+	};
+
+	int WALL = '#', EMPTY = ' ';
+
+	if(!PyArg_ParseTupleAndKeywords(args, kwargs, "|CC:to_string", kws, &WALL, &EMPTY)) {
+		return NULL;
+	}
+
+	char * str = grid_to_wall_string(self->q_grid, WALL, EMPTY);
+	PyObject * ret = PyUnicode_FromStringAndSize(str, self->q_grid->height * self->q_grid->width * 9 + self->q_grid->height * 3);
+	free(str);
+	return ret;
+}
+
+PyMethodDef PyMaze_methods[] = {
+	{"generate",   (PyCFunction) PyMaze_fill_maze,      METH_VARARGS | METH_KEYWORDS, "Fills maze with randomly generated maze"},
+	{"clear_maze", (PyCFunction) PyMaze_clear_maze,     METH_NOARGS,                  "Clears maze"},
+	{"set_start",  (PyCFunction) PyMaze_set_start_safe, METH_VARARGS,                 "Performs itegrity checks and sets start"},
+	{"set_exit",   (PyCFunction) PyMaze_set_exit_safe,  METH_VARARGS,                 "Performs itegrity checks and sets exit"},
+	{"to_string",  (PyCFunction) PyMaze_to_string,      METH_VARARGS | METH_KEYWORDS, "Serialize maze"},
 	{NULL}
 };
 
-PyTypeObject grid_type = {
+PyTypeObject PyMaze_Type = {
 	PyVarObject_HEAD_INIT(NULL, 0)
-	.tp_name            = "labyrinth_generator.Grid",
-	.tp_basicsize       = sizeof(PyGrid),
+	.tp_name            = "labyrinth_generator.Maze",
+	.tp_basicsize       = sizeof(PyMaze),
 	.tp_itemsize        = 0,
-	.tp_dealloc         = (destructor) PyGrid_del,
+	.tp_dealloc         = (destructor) PyMaze_del,
 	.tp_new             = PyType_GenericNew,
-	.tp_init            = (initproc) PyGrid_init,
+	.tp_init            = (initproc) PyMaze_init,
 	.tp_flags           = Py_TPFLAGS_DEFAULT,
-	.tp_repr            = (reprfunc) PyGrid_repr,
-	.tp_str             = (reprfunc) PyGrid_str,
-	.tp_methods         = PyGrid_methods,
-	.tp_getset          = PyGrid_getset,
-	.tp_as_mapping      = &PyGrid_mappings
+	.tp_repr            = (reprfunc) PyMaze_repr,
+	.tp_str             = (reprfunc) PyMaze_str,
+	.tp_methods         = PyMaze_methods,
+	.tp_getset          = PyMaze_getset,
+	.tp_as_mapping      = &PyMaze_mappings
 };
 #endif//GRID_PYTHON_CLASS_C_123S89F7DF987DG9S7DG

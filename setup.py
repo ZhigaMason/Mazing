@@ -6,7 +6,7 @@ os.environ["CC"] = "clang"
 SRCS = [
     "./src/python_module/labyrinth_generator.c",
     "./src/python_module/tile_class/tile_class.c",
-    "./src/python_module/grid_class/grid_class.c",
+    "./src/python_module/maze_class/maze_class.c",
     "./src/tile/tile.c",
     "./src/grid/grid.c",
     "./src/grid/data_structures/stack.c",

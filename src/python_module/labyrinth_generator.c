@@ -1,6 +1,6 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
-#include "./grid_class/grid_class.h"
+#include "./maze_class/maze_class.h"
 #include "./tile_class/tile_class.h"
 
 static PyMethodDef labyrinth_generator_module_methods[] = {
@@ -18,16 +18,16 @@ static PyModuleDef labyrinth_generator_module = {
 PyMODINIT_FUNC PyInit_labyrinth_generator() {
 	PyObject * module = PyModule_Create(&labyrinth_generator_module);
 
-	if (PyType_Ready(&grid_type) < 0) {
+	if (PyType_Ready(&PyMaze_Type) < 0) {
 		goto clean_module;
 	}
 
-	if (PyModule_AddObject(module, "Grid", (PyObject *)&grid_type) < 0) {
+	if (PyModule_AddObject(module, "Maze", (PyObject *)&PyMaze_Type) < 0) {
 		goto clean_grid_type;
 	}
 
-	PyGridTile_initialize_class();
-	if (PyModule_AddObject(module, "TILE", (PyObject *)&tile_type) < 0) {
+	PyMazeTile_initialize_class();
+	if (PyModule_AddObject(module, "TILE", (PyObject *)&PyMazeTile_Type) < 0) {
 		goto clean_tile_type;
 	}
 
@@ -35,10 +35,10 @@ PyMODINIT_FUNC PyInit_labyrinth_generator() {
 
 clean_tile_type:;
 	printf("f4'\n");
-	Py_DECREF(&tile_type);
+	Py_DECREF(&PyMazeTile_Type);
 clean_grid_type:;
 	printf("f5'\n");
-	Py_DECREF(&grid_type);
+	Py_DECREF(&PyMaze_Type);
 clean_module:;
 	printf("f6'\n");
 	Py_DECREF(module);

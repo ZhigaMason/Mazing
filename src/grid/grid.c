@@ -5,31 +5,26 @@
 #include "data_structures/random_container.h"
 #include <stdlib.h>
 #include <assert.h>
-#include <string.h>
-
-enum CMP _cmp_coords(TCoords l, TCoords r) {
-  	return l.x == r.x ? l.y > l.x : -(l.y > l.x);
-}
 
 struct pair_tiles tiles_from_step(TCoords src, TCoords dst) {
 	int dx = src.x - dst.x, dy = src.y - dst.y;
-	struct pair_tiles ret = {.f = WALL, .s=WALL};
+	struct pair_tiles ret = {.f = TILE_WALL, .s=TILE_WALL};
 	if(dx == 1) {
-		ret.f |= LEFT;
-		ret.s |= RIGHT;
+		ret.f |= TILE_LEFT;
+		ret.s |= TILE_RIGHT;
 	}
 	else if(dx == -1) {
-		ret.f |= RIGHT;
-		ret.s |= LEFT;
+		ret.f |= TILE_RIGHT;
+		ret.s |= TILE_LEFT;
 	}
 
 	if(dy == 1) {
-		ret.f |= UP;
-		ret.s |= DOWN;
+		ret.f |= TILE_UP;
+		ret.s |= TILE_DOWN;
 	}
 	else if(dy == -1) {
-		ret.f |= DOWN;
-		ret.s |= UP;
+		ret.f |= TILE_DOWN;
+		ret.s |= TILE_UP;
 	}
 
 	return ret;
@@ -52,7 +47,7 @@ void clean_grid(PtrGrid * ppg) {
 void clear_grid(PtrGrid pg) {
 	for(ETile ** it=pg->data, **end=pg->data + pg->height; it != end; ++it) {
 		for(ETile * jt = *it, *jend=*it + pg->width; jt != jend; ++jt)
-			*jt = WALL;
+			*jt = TILE_WALL;
 	}
 }
 
@@ -92,12 +87,12 @@ PtrGrid make_grid_corners(int height, int width) {
 	return make_grid(height, width, start, exit);
 }
 
-char *  grid_to_wall_string(PtrCGrid pg) {
+char *  grid_to_wall_string(PtrCGrid pg, char WALL, char EMPTY) {
 	ETile ** end   = pg->data + pg->height;
 	char * ret = calloc(pg->height * pg->width * 9 + pg->height * 3 + 1, sizeof(char));
 	char * str = ret;
 	for(ETile ** it = pg->data; it != end; ++it) {
-		tiles_to_wall_string(*it, pg->width, &str);
+		tiles_to_wall_string(*it, pg->width, &str, WALL, EMPTY);
 	}
 	*str = '\0';
 	ret[pg->width * 3 + 2 + pg->start.y * pg->width * 9 + pg->start.y * 3 + pg->start.x * 3] = 'S';
@@ -165,17 +160,17 @@ PtrProbaSp _make_blank_probability_space(PtrCGrid pg) {
 
 		ETile * end = *it + ret->width;
 		for(ETile * jt = *it; jt != end; ++jt)
-			*jt = EMPTY;
+			*jt = TILE_EMPTY;
 	}
 
         for(int i = 0; i < ret->height; ++i) {
-                ret->data[i][0]         &= ~LEFT;
-                ret->data[i][ret->width - 1] &= ~RIGHT;
+                ret->data[i][0]              &= ~TILE_LEFT;
+                ret->data[i][ret->width - 1] &= ~TILE_RIGHT;
         }
 
         for(int i = 0; i < ret->width; ++i) {
-                ret->data[0][i]               &= ~UP;
-                ret->data[ret->height - 1][i] &= ~DOWN;
+                ret->data[0][i]               &= ~TILE_UP;
+                ret->data[ret->height - 1][i] &= ~TILE_DOWN;
         }
 	return ret;
 }
