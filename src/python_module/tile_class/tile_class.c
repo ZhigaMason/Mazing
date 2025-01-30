@@ -22,7 +22,7 @@ PyObject * PyMazeTile_repr(PyMazeTile * self) {
 	static const wchar_t char_table[] = { L' ', L'╸', L'╺', L'━', L'╹', L'┛', L'┗', L'┻', L'╻', L'┓', L'┏', L'┳', L'┃', L'┫', L'┣', L'╋'};
 	if(self->q_val >= 16) {
 		PyErr_SetString(PyExc_AttributeError, "Unexpected tile representation");
-		return nullptr;
+		return NULL;
 	}
 	return PyUnicode_FromWideChar(&char_table[self->q_val], 1);
 }
@@ -32,7 +32,7 @@ void PyMazeTile_del(PyMazeTile * self) {
 }
 
 
-void PyMazeTile_initialize_class() {
+void PyMazeTile_initialize_class(void) {
 	if(!PyMazeTile_Type.tp_dict) PyMazeTile_Type.tp_dict = PyDict_New();
 
 	if(PyType_Ready(&PyMazeTile_Type) < 0) {

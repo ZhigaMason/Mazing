@@ -43,7 +43,7 @@ int PyMaze_init(PyMaze *self, PyObject *args, PyObject *kwargs) {
 	int height = 10, width = 10;
 	int dofill_grid = 0;
 	long seed = 1;
-	PyObject *start_tpl=nullptr, *exit_tpl = nullptr;
+	PyObject *start_tpl=NULL, *exit_tpl = NULL;
 
 	if(!PyArg_ParseTupleAndKeywords(args, kwargs, "|ii$OOpl:__init__", kws, &height, &width, &start_tpl, &exit_tpl, &dofill_grid, &seed)) {
 		return -1;
@@ -85,7 +85,7 @@ int PyMaze_init(PyMaze *self, PyObject *args, PyObject *kwargs) {
 		height, width,
 		start, exit
 	);
-	self->q_is_generated = false;
+	self->q_is_generated = 0;
 
 	if(!self->q_grid) {
 		PyErr_SetString(PyExc_MemoryError, "Memory allocation error occured.");
@@ -95,7 +95,7 @@ int PyMaze_init(PyMaze *self, PyObject *args, PyObject *kwargs) {
 
 	if(dofill_grid) {
 		fill_grid(self->q_grid, seed);
-		self->q_is_generated = true;
+		self->q_is_generated = 1;
 	}
 
 	return 0;
@@ -165,10 +165,10 @@ PyObject * PyMaze_getitem(PyMaze * self, PyObject * key) {
                 key, &c, "Expected tuple for start",
                 "Expected start tuple to have 2 entries",
                 "Expected start entries to be positive integers") < 0)
-		return nullptr;
+		return NULL;
 	if(c.x >= self->q_grid->width || c.y >= self->q_grid->height) {
 		PyErr_SetString(PyExc_IndexError, "Expected coordinates to be inside of maze");
-		return nullptr;
+		return NULL;
 	}
 	return _PyTile_Objects[self->q_grid->data[c.y][c.x]];
 }
@@ -200,21 +200,21 @@ PyMappingMethods PyMaze_mappings = {
 PyMaze * PyMaze_fill_maze(PyMaze * self, PyObject * args, PyObject * kwargs) {
 	static char * kws[]  = { "seed" };
 	if(!self->q_grid) {
-		return nullptr;
+		return NULL;
 	}
 	long seed = 1;
 	if(!PyArg_ParseTupleAndKeywords(args, kwargs, "|l: fill_maze", kws, &seed)){
-		return nullptr;
+		return NULL;
 	}
 	fill_grid(self->q_grid, seed);
-	self->q_is_generated = true;
+	self->q_is_generated = 1;
 	Py_INCREF(self);
 	return self;
 }
 
 PyMaze * PyMaze_clear_maze(PyMaze * self, PyObject * args) {
 	clear_grid(self->q_grid);
-	self->q_is_generated = false;
+	self->q_is_generated = 0;
 	Py_INCREF(self);
 	return self;
 }
@@ -223,22 +223,22 @@ PyMaze * PyMaze_set_start_safe(PyMaze * self, PyObject * args) {
 	int x, y;
 
 	if(!PyArg_ParseTuple(args, "ii", &x, &y)) {
-		return nullptr;
+		return NULL;
 	}
 
 	if( x < 0 || x >= self->q_grid->width || y >= self->q_grid->height || y < 0) {
 		PyErr_SetString(PyExc_IndexError, "Expected start to be inside of maze");
-		return nullptr;
+		return NULL;
 	}
 
 	if(self->q_is_generated && self->q_grid->data[y][x] == TILE_WALL) {
 		PyErr_SetString(PyExc_AttributeError, "Setting start into wall tile. Change self.is_filled attribute or replace tile");
-		return nullptr;
+		return NULL;
 	}
 
 	if(self->q_grid->exit.x == x && self->q_grid->exit.y == y) {
 		PyErr_SetString(PyExc_ValueError, "Start and exit cannot be on the same tile");
-		return nullptr;
+		return NULL;
 	}
 	self->q_grid->start.x = x;
 	self->q_grid->start.y = y;
@@ -251,22 +251,22 @@ PyMaze * PyMaze_set_exit_safe(PyMaze * self, PyObject * args) {
 	int x, y;
 
 	if(!PyArg_ParseTuple(args, "ii", &x, &y)) {
-		return nullptr;
+		return NULL;
 	}
 
 	if( x < 0 || x >= self->q_grid->width || y >= self->q_grid->height || y < 0) {
 		PyErr_SetString(PyExc_IndexError, "Expected exit to be inside of maze");
-		return nullptr;
+		return NULL;
 	}
 
 	if(self->q_is_generated && self->q_grid->data[y][x] == TILE_WALL) {
 		PyErr_SetString(PyExc_AttributeError, "Setting exit into wall tile. Change self.is_filled attribute or replace tile");
-		return nullptr;
+		return NULL;
 	}
 
 	if(self->q_grid->start.x == x && self->q_grid->start.y == y) {
 		PyErr_SetString(PyExc_ValueError, "Start and exit cannot be on the same tile");
-		return nullptr;
+		return NULL;
 	}
 	self->q_grid->exit.x = x;
 	self->q_grid->exit.y = y;

@@ -4,13 +4,13 @@
 #include "../../tile/tile.h"
 
 typedef struct {
-	PyObject_HEAD;
+	PyObject_HEAD
 	ETile q_val;
 } PyMazeTile;
 
 void PyMazeTile_del(PyMazeTile * self);
 PyObject * PyMazeTile_repr(PyMazeTile * self);
-void PyMazeTile_initialize_class();
+void PyMazeTile_initialize_class(void);
 
 extern PyTypeObject PyMazeTile_Type;
 extern PyObject * _PyTile_Objects[16];

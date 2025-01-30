@@ -2,15 +2,15 @@
 #define STACK_C_123129378912739179231
 #include "stack.h"
 
-TCoordsStack init_stack() {
-	TCoordsStack ret = {.data=nullptr, .capacity=0, .size=0};
+TCoordsStack init_stack(void) {
+	TCoordsStack ret = {.data=NULL, .capacity=0, .size=0};
 	return ret;
 }
 
 void clean_stack(PtrCoordsStack st) {
 	if(st->data) {
 		free(st->data);
-		st->data = nullptr;
+		st->data = NULL;
 		st->capacity = st->size = 0;
 	}
 }

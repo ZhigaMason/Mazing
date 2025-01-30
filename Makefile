@@ -1,5 +1,5 @@
 CC := clang
-CFLAGS := -pedantic -Wall -O2 -fPIC -std=c23
+CFLAGS := -pedantic -Wall -O2 -fPIC
 LD := clang
 LDFLAGS := $(CFLAGS)
 PYTHON := python3

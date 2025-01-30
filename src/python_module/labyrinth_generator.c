@@ -15,7 +15,7 @@ static PyModuleDef labyrinth_generator_module = {
 	.m_methods =labyrinth_generator_module_methods
 };
 
-PyMODINIT_FUNC PyInit_labyrinth_generator() {
+PyMODINIT_FUNC PyInit_labyrinth_generator(void) {
 	PyObject * module = PyModule_Create(&labyrinth_generator_module);
 
 	if (PyType_Ready(&PyMaze_Type) < 0) {

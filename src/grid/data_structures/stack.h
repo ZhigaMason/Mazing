@@ -9,7 +9,7 @@ typedef struct coords_stack_t {
 typedef TCoordsStack* PtrCoordsStack;
 typedef TCoordsStack* PtrCCoordsStack;
 
-TCoordsStack init_stack();
+TCoordsStack init_stack(void);
 
 void clean_stack(PtrCoordsStack);
 

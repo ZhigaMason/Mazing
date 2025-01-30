@@ -1,10 +1,9 @@
 #ifndef TILES_H_128937891273
 #define TILES_H_128937891273
-#include <stdint.h>
 #include <stdlib.h>
 #include <wchar.h>
 
-typedef enum tile_t : uint8_t {
+typedef enum tile_t {
         TILE_WALL              = 0,
         TILE_LEFT              = 1 << 0,
         TILE_RIGHT             = 1 << 1,

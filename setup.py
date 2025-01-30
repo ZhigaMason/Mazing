@@ -22,7 +22,7 @@ DIRS = [
 ]
 
 CC_ARGS = [
-    "-O2", "-Wall", "-std=c23", "-g"
+    "-O2", "-Wall", "-pedantic"
 ]
 
 extension = Extension(

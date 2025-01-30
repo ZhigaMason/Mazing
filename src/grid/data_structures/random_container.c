@@ -2,15 +2,15 @@
 #define RANDOM_CONTAINER_C_131123123123
 #include "random_container.h"
 
-TCoordsRandContainer init_random_container() {
-	TCoordsRandContainer ret = {.data=nullptr, .capacity=0, .size=0};
+TCoordsRandContainer init_random_container(void) {
+	TCoordsRandContainer ret = {.data=NULL, .capacity=0, .size=0};
 	return ret;
 }
 
 void clean_random(PtrCoordsRandContainer rc) {
 	if(rc->data) {
 		free(rc->data);
-		rc->data = nullptr;
+		rc->data = NULL;
 		rc->capacity = rc->size = 0;
 	}
 }

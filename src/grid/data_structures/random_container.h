@@ -9,7 +9,7 @@ typedef struct coords_random_container_t {
 typedef TCoordsRandContainer* PtrCoordsRandContainer;
 typedef TCoordsRandContainer* PtrCCoordsRandomContainer;
 
-TCoordsRandContainer init_random_container();
+TCoordsRandContainer init_random_container(void);
 
 void clean_random(PtrCoordsRandContainer);
 

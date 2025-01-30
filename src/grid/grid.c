@@ -41,7 +41,7 @@ void clean_grid(PtrGrid * ppg) {
 	}
 	free(pg->data);
 	free(pg);
-	*ppg = nullptr;
+	*ppg = NULL;
 }
 
 void clear_grid(PtrGrid pg) {
@@ -58,7 +58,7 @@ PtrGrid make_grid(int height, int width, TCoords start, TCoords exit) {
 		start.y < 0 || exit.y < 0 ||
 		start.y >= height || exit.y >= height ||
 		(start.x == exit.x && start.y == exit.y)
-	) return nullptr;
+	) return NULL;
 
 	PtrGrid ret = malloc(sizeof(*ret));
 	{
@@ -68,7 +68,7 @@ PtrGrid make_grid(int height, int width, TCoords start, TCoords exit) {
 	ret->data = calloc(height, sizeof(*ret->data));
 	if(!ret->data) {
 		free(ret->data);
-		return nullptr;
+		return NULL;
 	}
 	ETile ** end = ret->data + ret->height;
 	for(ETile ** it = ret->data; it != end; ++it) {
@@ -76,7 +76,7 @@ PtrGrid make_grid(int height, int width, TCoords start, TCoords exit) {
 		if(!*it) {
 			ret->height = it - ret->data + 1;
 			clean_grid(&ret);
-			return nullptr;
+			return NULL;
 		}
 	}
 	return ret;
@@ -115,7 +115,7 @@ wchar_t * grid_to_path_string(PtrCGrid pg) {
 
 TCoords * _neighbors(PtrCGrid pg, TCoords cs) {
 	static TCoords ret[] = {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, 0}};
-	uint8_t idx = 0;
+	int idx = 0;
 	if(cs.x > 0) {
 		ret[idx].x = cs.x - 1;
 		ret[idx++].y = cs.y;
@@ -147,7 +147,7 @@ PtrProbaSp _make_blank_probability_space(PtrCGrid pg) {
 	ret->data = calloc(ret->height, sizeof(*ret->data));
 	if(!ret->data) {
 		free(ret->data);
-		return nullptr;
+		return NULL;
 	}
 	ETile ** end = ret->data + ret->height;
 	for(ETile ** it = ret->data; it != end; ++it) {
@@ -155,7 +155,7 @@ PtrProbaSp _make_blank_probability_space(PtrCGrid pg) {
 		if(!*it) {
 			ret->height = it - ret->data + 1;
 			_clean_probability_space(&ret);
-			return nullptr;
+			return NULL;
 		}
 
 		ETile * end = *it + ret->width;
@@ -180,7 +180,7 @@ PtrProbaSp _generate_path(PtrGrid pg) {
 	push_stack(&st, pg->start);
 
 	PtrGrid grid_visited = make_grid_corners(pg->height, pg->width);
-	uint8_t ** visited = grid_visited->data;
+	ETile ** visited = grid_visited->data;
 	visited[pg->start.y][pg->start.x] = 1;
 
 	while(st.size) {
@@ -208,8 +208,8 @@ PtrProbaSp _generate_path(PtrGrid pg) {
 		if(!length)
 			pop_stack(&st);
 	}
-__path_generate_construction:
-	PtrProbaSp pss = nullptr;
+__path_generate_construction:;
+	PtrProbaSp pss = NULL;
 	if(!st.size) goto __path_generate_clean;
 
 	pss = _make_blank_probability_space(pg);
@@ -225,7 +225,7 @@ __path_generate_construction:
 		prob[it->y][it->x]   &= ~tiles.s;
 	}
 
-__path_generate_clean:
+__path_generate_clean:;
 	clean_stack(&st);
 	clean_grid(&grid_visited);
 	return pss;
@@ -233,7 +233,7 @@ __path_generate_clean:
 
 void _colapse_wave_function(PtrGrid pg, PtrProbaSp pps) {
 	PtrGrid grid_visited = make_grid_corners(pg->height, pg->width);
-	uint8_t ** visited = grid_visited->data;
+	ETile ** visited = grid_visited->data;
 	visited[pg->start.y][pg->start.x] = 1;
 	visited[pg->exit.y][pg->exit.x] = 1;
 

@@ -2,13 +2,9 @@
 #define GRID_H_12837891273891278
 #include "../tile/tile.h"
 
-enum CMP : int8_t {LESS = -1, EQUAL = 0, GREAT = 1};
-
 typedef struct coords_t {
 	int x, y;
 } TCoords;
-
-enum CMP _cmp_coords(TCoords l, TCoords r);
 
 struct pair_tiles {
   ETile f, s;

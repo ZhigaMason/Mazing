@@ -4,9 +4,9 @@
 #include "../../grid/grid.h"
 
 typedef struct {
-	PyObject_HEAD;
+	PyObject_HEAD
 	PtrGrid q_grid;
-	bool q_is_generated;
+	uint8_t q_is_generated;
 } PyMaze;
 
 int PyMaze_init(PyMaze *self, PyObject *args, PyObject *kwargs);
