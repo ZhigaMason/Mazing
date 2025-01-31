@@ -1,8 +1,6 @@
 import os
 from setuptools import setup, Extension
 
-os.environ["CC"] = "clang"
-
 SRCS = [
     "./src/python_module/labyrinth_generator.c",
     "./src/python_module/tile_class/tile_class.c",

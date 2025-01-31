@@ -27,5 +27,3 @@ clean:
 clean-all: clean
 	rm $(targets)
 	rm $(sources:.c=.o)
-
-include Makefile.d
