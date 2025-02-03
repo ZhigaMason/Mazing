@@ -120,6 +120,14 @@ PyObject * PyMaze_repr(PyMaze * self) {
 	return ret;
 }
 
+PyObject * PyMaze_get_width(PyMaze * self, void * closure) {
+	return PyLong_FromLong(self->q_grid->width);
+}
+
+PyObject * PyMaze_get_height(PyMaze * self, void * closure) {
+	return PyLong_FromLong(self->q_grid->height);
+}
+
 PyObject * PyMaze_get_start(PyMaze * self, void * closure) {
 	return _coords_t_to_pytuple(self->q_grid->start);
 }
@@ -153,10 +161,12 @@ int PyMaze_set_is_generated(PyMaze * self, PyObject * value, void * closure) {
 }
 
 PyGetSetDef PyMaze_getset[] = {
-    {"start",        (getter)PyMaze_get_start,         (setter)PyMaze_set_start,         "Start coordinates in the maze", NULL},
-    {"exit",         (getter)PyMaze_get_exit,          (setter)PyMaze_set_exit,          "Exit coordinates in the maze",  NULL},
-    {"is_generated", (getter)PyMaze_get_is_generated,  (setter)PyMaze_set_is_generated,  "Bool value if maze is filled",  NULL},
-    {NULL}
+	{"width",        (getter)PyMaze_get_width,        (setter)NULL,                     "Get width of maze",             NULL},
+	{"height",       (getter)PyMaze_get_height,       (setter)NULL,                     "Get height of maze",            NULL},
+	{"start",        (getter)PyMaze_get_start,        (setter)PyMaze_set_start,         "Start coordinates in the maze", NULL},
+    	{"exit",         (getter)PyMaze_get_exit,         (setter)PyMaze_set_exit,          "Exit coordinates in the maze",  NULL},
+    	{"is_generated", (getter)PyMaze_get_is_generated, (setter)PyMaze_set_is_generated,  "Bool value if maze is filled",  NULL},
+    	{NULL}
 };
 
 PyObject * PyMaze_getitem(PyMaze * self, PyObject * key) {
@@ -303,7 +313,7 @@ PyMethodDef PyMaze_methods[] = {
 
 PyTypeObject PyMaze_Type = {
 	PyVarObject_HEAD_INIT(NULL, 0)
-	.tp_name            = "labyrinth_generator.Maze",
+	.tp_name            = "mazing.Maze",
 	.tp_basicsize       = sizeof(PyMaze),
 	.tp_itemsize        = 0,
 	.tp_dealloc         = (destructor) PyMaze_del,

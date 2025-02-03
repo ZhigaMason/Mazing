@@ -18,6 +18,10 @@ PyObject * PyMaze_str(PyMaze * self);
 PyObject * PyMaze_repr(PyMaze * self);
 
 // Getters and setters
+PyObject * PyMaze_get_width(PyMaze * self, void * closure);
+
+PyObject * PyMaze_get_height(PyMaze * self, void * closure);
+
 PyObject * PyMaze_get_start(PyMaze * self, void * closure);
 
 int PyMaze_set_start(PyMaze * self, PyObject * value, void * closure);

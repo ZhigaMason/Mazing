@@ -1,4 +1,4 @@
-# Labyrinth generator
+# Mazing
 
 Generate labyrinthes blazingly fast.
 
@@ -30,7 +30,7 @@ export PYTHONPATH="${PYTHONPATH}:${PWD}/build/lib.linux-x86_64-cpython-312/labyr
 
 Build:
 
-* clang >= 9.0
+* clang
 * Makefile
 * python >= 3.10
     - build

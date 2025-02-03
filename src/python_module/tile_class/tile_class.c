@@ -5,7 +5,7 @@
 
 PyTypeObject PyMazeTile_Type = {
 	PyVarObject_HEAD_INIT(NULL, 0)
-	.tp_name            = "labyrinth_generator.Tile",
+	.tp_name            = "mazing.TILE",
 	.tp_basicsize       = sizeof(PyMazeTile),
 	.tp_dealloc         = (destructor) PyMazeTile_del,
 	.tp_new             = 0,
