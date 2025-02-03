@@ -33,12 +33,6 @@ def test_maze_init_exceptions(kwargs):
     with pytest.raises(ValueError):
         Maze(**kwargs)
 
-def test_maze_str():
-    pass
-
-def test_maze_repr():
-    pass
-
 @pytest.mark.parametrize(
     ['w', 'h'],
     [
@@ -116,3 +110,47 @@ def test_maze_subscipt_operator(gen_init, coords, tile, kwargs):
         assert m[*m.exit]  != TILE.WALL
     m[*coords] = tile
     assert m[*coords] == tile
+
+@pytest.mark.parametrize(
+    ['itr', 'kwargs', '_repr', '_str'],
+    [
+        (
+            [
+                ((0,0), TILE.UP), ((0,1), TILE.DOWN), ((1, 0), TILE.LEFT),((1,1), TILE.RIGHT)
+            ],
+            dict(height=2, width=2),
+            'S╸\n╻E\n', '# ####\n#S#  #\n######\n######\n# ##E \n# ####\n'
+        ),
+        (
+            [
+                ((0,0), TILE.UP), ((0,1), TILE.DOWN), ((1, 0), TILE.LEFT),((1,1), TILE.RIGHT)
+            ],
+            dict(height=2, width=2, start=(1,0), exit=(0,1)),
+            '╹S\nE╺\n', '# ####\n# # S#\n######\n######\n#E##  \n# ####\n'
+        ),
+        (
+            [
+                ((0, 0), TILE.LEFT_UP), ((0, 1), TILE.LEFT_DOWN), ((1, 0), TILE.RIGHT_UP), ((1,1), TILE.RIGHT_DOWN),
+            ],
+            dict(height=2, width=2, start=(1,0), exit=(0,1)),
+            '┛S\nE┏\n', '# ## #\n  ##S \n######\n######\n E##  \n# ## #\n'
+        ),
+        (
+            [
+                ((0,0), TILE.UP), ((0,1), TILE.DOWN), ((0, 2), TILE.LEFT),((0,3), TILE.RIGHT),
+                ((1, 0), TILE.LEFT_UP), ((1, 1), TILE.LEFT_DOWN), ((1, 2), TILE.RIGHT_UP), ((1,3), TILE.RIGHT_DOWN),
+                ((2, 0), TILE.HOR), ((2, 1), TILE.VER), ((2, 2), TILE.EMPTY), ((2,3), TILE.WALL),
+                ((3, 0), TILE.WALL_UP), ((3, 1), TILE.WALL_LEFT), ((3, 2), TILE.WALL_RIGHT), ((3,3), TILE.WALL_DOWN),
+            ],
+            dict(height=4, width=4),
+            'S┛━┳\n╻┓┃┣\n╸┗╋┫\n╺┏ E\n',
+            '# ## #######\n#S#  #      \n########## #\n####### ## #\n# #  ## ##  \n# ## ## ## #\n#### ## ## #\n  ##       #\n####### ## #\n########## #\n#  #  ### E \n#### #######\n'
+        )
+    ]
+)
+def test_maze_str(itr, kwargs, _repr, _str):
+    m = Maze(**kwargs)
+    for (x,y),tile in itr:
+        m[x, y] = tile
+    assert repr(m) == _repr
+    assert str(m)  == _str
