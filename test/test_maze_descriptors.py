@@ -89,23 +89,30 @@ def test_maze_is_generated(gen_init, gen_method, kwargs):
         assert m.generate().is_generated
 
 @pytest.mark.parametrize(
-    ['gen_init', 'coords', 'tile', 'kwargs'],
+    ['gen_init', 'gen_method', 'coords', 'tile', 'kwargs'],
     [
-        (False, (4, 6), TILE.UP, {}),
-        (True,  (7, 9), TILE.DOWN, dict(start=(1,4))),
-        (False, (3, 1), TILE.LEFT, dict(exit=(5, 6))),
-        (True,  (5, 4), TILE.RIGHT, dict(start=(4,7), exit=(3, 2))),
-        (False, (randint(0, 99), randint(0, 99)), TILE.HOR, dict(height=100, width=100)),
-        (True,  (randint(0, 99), randint(0, 99)), TILE.LEFT_UP, dict(height=100, width=100, start=(55, 99))),
-        (False, (randint(0, 99), randint(0, 99)), TILE.RIGHT_DOWN, dict(height=100, width=100, start=(72, 11))),
-        (False, (randint(0, 99), randint(0, 99)), TILE.LEFT_DOWN, dict(height=100, width=100, exit=(1, 83))),
-        (True,  (randint(0, 99), randint(0, 99)), TILE.EMPTY, dict(height=100, width=100, exit=(10, 56))),
-        (False, (randint(0, 99), randint(0, 99)), TILE.VER, dict(height=100, width=100, start=(2, 19), exit=(0, 76))),
+        (False, False, (4, 6), TILE.UP, {}),
+        (True,  False, (7, 9), TILE.DOWN, dict(start=(1,4))),
+        (False, True,  (3, 1), TILE.LEFT, dict(exit=(5, 6))),
+        (True,  True,  (5, 4), TILE.RIGHT, dict(start=(4,7), exit=(3, 2))),
+        (False, False, (randint(0, 99), randint(0, 99)), TILE.HOR, dict(height=100, width=100)),
+        (True,  False, (randint(0, 99), randint(0, 99)), TILE.LEFT_UP, dict(height=100, width=100, start=(55, 99))),
+        (False, True,  (randint(0, 99), randint(0, 99)), TILE.RIGHT_DOWN, dict(height=100, width=100, start=(72, 11))),
+        (False, False, (randint(0, 99), randint(0, 99)), TILE.LEFT_DOWN, dict(height=100, width=100, exit=(1, 83))),
+        (True,  False, (randint(0, 99), randint(0, 99)), TILE.EMPTY, dict(height=100, width=100, exit=(10, 56))),
+        (False, False, (randint(0, 99), randint(0, 99)), TILE.VER, dict(height=100, width=100, start=(2, 19), exit=(0, 76))),
     ]
 )
-def test_maze_subscipt_operator(gen_init, coords, tile, kwargs):
+def test_maze_subscipt_operator(gen_init, gen_method, coords, tile, kwargs):
     m = Maze(**kwargs, fill=gen_init)
     if gen_init:
+        assert m[*m.start] != TILE.WALL
+        assert m[*m.exit]  != TILE.WALL
+    m.clear()
+    assert m[*m.start] == TILE.WALL
+    assert m[*m.exit]  == TILE.WALL
+    if gen_method:
+        m.generate()
         assert m[*m.start] != TILE.WALL
         assert m[*m.exit]  != TILE.WALL
     m[*coords] = tile

@@ -180,7 +180,9 @@ PyObject * PyMaze_getitem(PyMaze * self, PyObject * key) {
 		PyErr_SetString(PyExc_IndexError, "Expected coordinates to be inside of maze");
 		return NULL;
 	}
-	return _PyTile_Objects[self->q_grid->data[c.y][c.x]];
+	PyObject * ret = _PyTile_Objects[self->q_grid->data[c.y][c.x]];
+	Py_INCREF(ret);
+	return ret;
 }
 
 int PyMaze_setitem(PyMaze * self, PyObject * key, PyObject * val) {
