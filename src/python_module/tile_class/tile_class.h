@@ -10,6 +10,7 @@ typedef struct {
 
 void PyMazeTile_del(PyMazeTile * self);
 PyObject * PyMazeTile_repr(PyMazeTile * self);
+PyObject * PyMazeTile_get_value(PyMazeTile * self, void * closure);
 void PyMazeTile_initialize_class(void);
 
 extern PyTypeObject PyMazeTile_Type;

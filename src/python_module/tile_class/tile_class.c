@@ -3,18 +3,6 @@
 #include <Python.h>
 #include "./tile_class.h"
 
-PyTypeObject PyMazeTile_Type = {
-	PyVarObject_HEAD_INIT(NULL, 0)
-	.tp_name            = "mazing.TILE",
-	.tp_basicsize       = sizeof(PyMazeTile),
-	.tp_dealloc         = (destructor) PyMazeTile_del,
-	.tp_new             = 0,
-	.tp_init            = 0,
-	.tp_flags           = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_DISALLOW_INSTANTIATION,
-	.tp_repr            = (reprfunc) PyMazeTile_repr,
-	.tp_str             = (reprfunc) PyMazeTile_repr,
-	.tp_doc             = "Tile grid class with constant tiles"
-};
 
 PyObject * _PyTile_Objects[16] = {0};
 
@@ -25,6 +13,10 @@ PyObject * PyMazeTile_repr(PyMazeTile * self) {
 		return NULL;
 	}
 	return PyUnicode_FromWideChar(&char_table[self->q_val], 1);
+}
+
+PyObject * PyMazeTile_get_value(PyMazeTile * self, void * closure) {
+	return PyLong_FromLong(self->q_val);
 }
 
 void PyMazeTile_del(PyMazeTile * self) {
@@ -75,4 +67,24 @@ void PyMazeTile_initialize_class(void) {
 	}
 
 }
+
+static PyGetSetDef PyMazeTile_getset[] = {
+	{"_value", (getter)PyMazeTile_get_value, (setter)NULL, "Internal encoding of tile", NULL},
+	{NULL}
+};
+
+PyTypeObject PyMazeTile_Type = {
+	PyVarObject_HEAD_INIT(NULL, 0)
+	.tp_name            = "mazing.TILE",
+	.tp_basicsize       = sizeof(PyMazeTile),
+	.tp_dealloc         = (destructor) PyMazeTile_del,
+	.tp_new             = 0,
+	.tp_init            = 0,
+	.tp_flags           = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_DISALLOW_INSTANTIATION,
+	.tp_repr            = (reprfunc) PyMazeTile_repr,
+	.tp_str             = (reprfunc) PyMazeTile_repr,
+	.tp_getset          = PyMazeTile_getset,
+	.tp_doc             = "Tile grid class with constant tiles"
+};
+
 #endif//TILE_PYTHON_CLASS_C_1837678126381263812763

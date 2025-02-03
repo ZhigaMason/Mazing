@@ -49,7 +49,7 @@ int PyMaze_init(PyMaze *self, PyObject *args, PyObject *kwargs) {
 		return -1;
 	}
 
-	if(height < 1 || width < 1) {
+	if(height <= 1 || width <= 1) {
 		PyErr_SetString(PyExc_ValueError, "Expected height and width of grid to be greater than one.");
 		return -1;
 	}
@@ -61,8 +61,8 @@ int PyMaze_init(PyMaze *self, PyObject *args, PyObject *kwargs) {
 		start_tpl, &start, "Expected tuple for start", "Expected start tuple to have 2 entries", "Expected start entries to be positive integers"
 	)) return -1;
 
-	if(start.x >= width && start.y >= height) {
-		PyErr_SetString(PyExc_IndexError, "Expected start to be inside of maze");
+	if(start.x >= width || start.y >= height) {
+		PyErr_SetString(PyExc_ValueError, "Expected start to be inside of maze");
 		return -1;
 	}
 
@@ -70,8 +70,8 @@ int PyMaze_init(PyMaze *self, PyObject *args, PyObject *kwargs) {
 		exit_tpl, &exit, "Expected tuple for exit", "Expected exit tuple to have 2 entries", "Expected exit entries to be positive integers"
 	)) return -1;
 
-	if(exit.x >= width && exit.y >= height) {
-		PyErr_SetString(PyExc_IndexError, "Expected exit to be inside of maze");
+	if(exit.x >= width || exit.y >= height) {
+		PyErr_SetString(PyExc_ValueError, "Expected exit to be inside of maze");
 		return -1;
 	}
 
@@ -208,10 +208,7 @@ PyMappingMethods PyMaze_mappings = {
 };
 
 PyMaze * PyMaze_fill_maze(PyMaze * self, PyObject * args, PyObject * kwargs) {
-	static char * kws[]  = { "seed" };
-	if(!self->q_grid) {
-		return NULL;
-	}
+	static char * kws[]  = { "seed", NULL };
 	long seed = 1;
 	if(!PyArg_ParseTupleAndKeywords(args, kwargs, "|l: fill_maze", kws, &seed)){
 		return NULL;
@@ -303,11 +300,11 @@ PyObject * PyMaze_to_string(PyMaze * self, PyObject * args, PyObject * kwargs) {
 }
 
 PyMethodDef PyMaze_methods[] = {
-	{"generate",   (PyCFunction) PyMaze_fill_maze,      METH_VARARGS | METH_KEYWORDS, "Fills maze with randomly generated maze"},
-	{"clear_maze", (PyCFunction) PyMaze_clear_maze,     METH_NOARGS,                  "Clears maze"},
-	{"set_start",  (PyCFunction) PyMaze_set_start_safe, METH_VARARGS,                 "Performs itegrity checks and sets start"},
-	{"set_exit",   (PyCFunction) PyMaze_set_exit_safe,  METH_VARARGS,                 "Performs itegrity checks and sets exit"},
-	{"to_string",  (PyCFunction) PyMaze_to_string,      METH_VARARGS | METH_KEYWORDS, "Serialize maze"},
+	{"generate",  (PyCFunction) PyMaze_fill_maze,      METH_VARARGS | METH_KEYWORDS, "Fills maze with randomly generated maze"},
+	{"clear",     (PyCFunction) PyMaze_clear_maze,     METH_NOARGS,                  "Clears maze"},
+	{"set_start", (PyCFunction) PyMaze_set_start_safe, METH_VARARGS,                 "Performs itegrity checks and sets start"},
+	{"set_exit",  (PyCFunction) PyMaze_set_exit_safe,  METH_VARARGS,                 "Performs itegrity checks and sets exit"},
+	{"to_string", (PyCFunction) PyMaze_to_string,      METH_VARARGS | METH_KEYWORDS, "Serialize maze"},
 	{NULL}
 };
 
