@@ -7,23 +7,21 @@ PYTHON := python3
 sources := cli/main.c src/tile/tile.c src/grid/grid.c \
 	   src/grid/data_structures/stack.c src/grid/data_structures/random_container.c
 
-python_extension := build/lib.linux-x86_64-cpython-312/labyrinth_generator.cpython-312-x86_64-linux-gnu.so
-targets := genlab $(python_extension)
+python_extension := python_ext
+executable := genlab $(python_extension)
 
-all: $(targets)
+all: $(executable)
 
 genlab: $(sources:.c=.o)
 	$(LD) $(LDFLAGS) $^ -o $@
 
 $(python_extension): setup.py
-	python3 setup.py build
-
-rules:
-	@$(CXX) -MM $(sources)
+	$(PYTHON) $< build
+	$(PYTHON) $< install
 
 clean:
 	rm $(sources:.c=.o)
 
 clean-all: clean
-	rm $(targets)
+	rm $(executable)
 	rm $(sources:.c=.o)
