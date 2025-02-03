@@ -33,6 +33,6 @@ extension = Extension(
 setup(
     name="mazing",
     version="0.1",
-    description="Lorem ipsum", # TODO write python module description
+    description="Module to generate and interacte with mazes written in C for fast performance.",
     ext_modules=[extension]
 )

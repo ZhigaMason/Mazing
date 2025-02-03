@@ -313,6 +313,7 @@ PyMethodDef PyMaze_methods[] = {
 PyTypeObject PyMaze_Type = {
 	PyVarObject_HEAD_INIT(NULL, 0)
 	.tp_name            = "mazing.Maze",
+	.tp_doc             = "Class representing maze.",
 	.tp_basicsize       = sizeof(PyMaze),
 	.tp_itemsize        = 0,
 	.tp_dealloc         = (destructor) PyMaze_del,

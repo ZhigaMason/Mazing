@@ -7,7 +7,7 @@
 static PyModuleDef labyrinth_generator_module = {
 	PyModuleDef_HEAD_INIT,
 	.m_name    ="mazing",
-	.m_doc     ="Docstring",
+	.m_doc     ="Module to generate and interacte with mazes written in C for fast performance.",
 	.m_size    =-1,
 	.m_methods =NULL
 };
