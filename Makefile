@@ -17,11 +17,13 @@ genlab: $(sources:.c=.o)
 
 $(python_extension): setup.py
 	$(PYTHON) $< build
-	$(PYTHON) $< install
+	$(PYTHON) -m pip install .
 
 clean:
 	rm $(sources:.c=.o)
 
+clean-python:
+	rm -rf build dist *.egg-info
+
 clean-all: clean
 	rm $(executable)
-	rm $(sources:.c=.o)

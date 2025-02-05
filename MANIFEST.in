@@ -1,0 +1,2 @@
+# Explicitly include all headers to create soursce distribution
+global-include src/**.h
