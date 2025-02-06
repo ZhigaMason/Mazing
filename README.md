@@ -4,6 +4,14 @@ Python module in C to generate labyrinthes blazingly fast.
 
 ## USAGE
 
+### Python module (avaliable for linux only)
+
+Use pip to install the package.
+
+```bash
+pip install mazing
+```
+
 ### Build
 
 To build this application use make.
