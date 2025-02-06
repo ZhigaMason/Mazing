@@ -6,7 +6,7 @@
 #include "../../grid/grid.h"
 
 
-PyObject * _coords_t_to_pytuple(TCoords c) {
+static PyObject * _coords_t_to_pytuple(TCoords c) {
 	PyObject * ret = PyTuple_New(2);
 	PyTuple_SET_ITEM(ret, 0, PyLong_FromLong(c.x));
 	PyTuple_SET_ITEM(ret, 1, PyLong_FromLong(c.y));
@@ -161,11 +161,11 @@ int PyMaze_set_is_generated(PyMaze * self, PyObject * value, void * closure) {
 }
 
 PyGetSetDef PyMaze_getset[] = {
-	{"width",        (getter)PyMaze_get_width,        (setter)NULL,                     "Get width of maze",             NULL},
-	{"height",       (getter)PyMaze_get_height,       (setter)NULL,                     "Get height of maze",            NULL},
-	{"start",        (getter)PyMaze_get_start,        (setter)PyMaze_set_start,         "Start coordinates in the maze", NULL},
-    	{"exit",         (getter)PyMaze_get_exit,         (setter)PyMaze_set_exit,          "Exit coordinates in the maze",  NULL},
-    	{"is_generated", (getter)PyMaze_get_is_generated, (setter)PyMaze_set_is_generated,  "Bool value if maze is filled",  NULL},
+	{"width",        (getter)PyMaze_get_width,        (setter)NULL,                     "Get width of maze",                                 NULL},
+	{"height",       (getter)PyMaze_get_height,       (setter)NULL,                     "Get height of maze",                                NULL},
+	{"start",        (getter)PyMaze_get_start,        (setter)PyMaze_set_start,         "Start coordinates in the maze as an integer tuple", NULL},
+    	{"exit",         (getter)PyMaze_get_exit,         (setter)PyMaze_set_exit,          "Exit coordinates in the maze as an integer tuple",  NULL},
+    	{"is_generated", (getter)PyMaze_get_is_generated, (setter)PyMaze_set_is_generated,  "Bool value if maze is filled",                      NULL},
     	{NULL}
 };
 
@@ -205,8 +205,8 @@ int PyMaze_setitem(PyMaze * self, PyObject * key, PyObject * val) {
 }
 
 PyMappingMethods PyMaze_mappings = {
-    .mp_subscript = (binaryfunc)PyMaze_getitem,
-    .mp_ass_subscript = (objobjargproc)PyMaze_setitem,  // __setitem__
+    .mp_subscript     = (binaryfunc)PyMaze_getitem,
+    .mp_ass_subscript = (objobjargproc)PyMaze_setitem,
 };
 
 PyMaze * PyMaze_fill_maze(PyMaze * self, PyObject * args, PyObject * kwargs) {
@@ -302,18 +302,26 @@ PyObject * PyMaze_to_string(PyMaze * self, PyObject * args, PyObject * kwargs) {
 }
 
 PyMethodDef PyMaze_methods[] = {
-	{"generate",  (PyCFunction) PyMaze_fill_maze,      METH_VARARGS | METH_KEYWORDS, "Fills maze with randomly generated maze"},
+	{"generate",  (PyCFunction) PyMaze_fill_maze,      METH_VARARGS | METH_KEYWORDS,
+		"Fills maze with randomly generated maze\n"
+		"    seed:int=1 - Seed is not used in further self.generate() calls, it must be used explicitly."},
 	{"clear",     (PyCFunction) PyMaze_clear_maze,     METH_NOARGS,                  "Clears maze"},
-	{"set_start", (PyCFunction) PyMaze_set_start_safe, METH_VARARGS,                 "Performs itegrity checks and sets start"},
-	{"set_exit",  (PyCFunction) PyMaze_set_exit_safe,  METH_VARARGS,                 "Performs itegrity checks and sets exit"},
-	{"to_string", (PyCFunction) PyMaze_to_string,      METH_VARARGS | METH_KEYWORDS, "Serialize maze"},
+	{"set_start", (PyCFunction) PyMaze_set_start_safe, METH_VARARGS,                 "Performs itegrity checks and sets start\n    x,y:int"},
+	{"set_exit",  (PyCFunction) PyMaze_set_exit_safe,  METH_VARARGS,                 "Performs itegrity checks and sets exit\n    x,y:int"},
+	{"to_string", (PyCFunction) PyMaze_to_string,      METH_VARARGS | METH_KEYWORDS, "Serialize maze:\n    wall:char='#'\n    empty:char='_'"},
 	{NULL}
 };
 
 PyTypeObject PyMaze_Type = {
 	PyVarObject_HEAD_INIT(NULL, 0)
 	.tp_name            = "mazing.Maze",
-	.tp_doc             = "Class representing maze.",
+	.tp_doc             = "mazing.Maze(height, width, start=(0,0), exit=(width-1,height-1), fill=False, seed=1)\n"
+			      "    height : int=10 - height of maze\n"
+			      "    width  : int=10 - width of maze\n"
+			      "    start  : Tuple[int, int]=(0,0) - x and y coordinates of maze start\n"
+			      "    exit   : Tuple[int, int]=(width-1,height-1) - x and y coordinates of maze exit\n"
+			      "    fill   : bool - if fill=True the maze will be generated with seed\n"
+			      "    seed   : int=1 - seed to generate maze with. Seed is not used in further self.generate() calls, it must be used explicitly.\n",
 	.tp_basicsize       = sizeof(PyMaze),
 	.tp_itemsize        = 0,
 	.tp_dealloc         = (destructor) PyMaze_del,
